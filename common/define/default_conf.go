@@ -1,7 +1,7 @@
 package define
 
 const (
-	DBFileDirName  = "MyPicViu"
+	DBFileDirName  = "TFLanHttpDesktop"
 	DBFileFileName = "data.db"
 )
 

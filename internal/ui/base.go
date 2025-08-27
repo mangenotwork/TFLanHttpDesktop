@@ -8,6 +8,7 @@ import (
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
@@ -21,11 +22,44 @@ func InitUI() {
 	MainApp = app.NewWithID("TFLanHttpDesktop.2025.0826")
 	MainWindow = MainApp.NewWindow("TFLanHttpDesktop")
 	logger.Debug("初始化UI")
+
+	logLifecycle(MainApp)
+	makeTray(MainApp)
+
 	MainWindow.Resize(fyne.NewSize(1600, 900))
 	MainWindow.SetMainMenu(MakeMenu())
 	MainWindow.SetMaster()
 	MainWindow.SetContent(MainContent())
 	MainWindow.ShowAndRun()
+}
+
+func logLifecycle(a fyne.App) {
+	a.Lifecycle().SetOnStarted(func() {
+		logger.Debug("Lifecycle: Started")
+	})
+	a.Lifecycle().SetOnStopped(func() {
+		logger.Debug("Lifecycle: Stopped")
+	})
+	a.Lifecycle().SetOnEnteredForeground(func() {
+		logger.Debug("Lifecycle: Entered Foreground")
+	})
+	a.Lifecycle().SetOnExitedForeground(func() {
+		logger.Debug("Lifecycle: Exited Foreground")
+	})
+}
+
+func makeTray(a fyne.App) {
+	if desk, ok := a.(desktop.App); ok {
+		h := fyne.NewMenuItem("Hello", func() {})
+		h.Icon = theme.HomeIcon()
+		menu := fyne.NewMenu("Hello World", h)
+		h.Action = func() {
+			logger.Debug("System tray menu tapped")
+			h.Label = "Welcome"
+			menu.Refresh()
+		}
+		desk.SetSystemTrayMenu(menu)
+	}
 }
 
 var RightContainer *container.Split
@@ -111,7 +145,7 @@ func MainContent() *container.Split {
 	UploadTitleContainer := container.NewCenter(UploadTitle)
 	UploadContainer.Add(layout.NewSpacer())
 	UploadContainer.Add(UploadTitleContainer)
-	DownloadContainer.Add(layout.NewSpacer())
+	UploadContainer.Add(layout.NewSpacer())
 	//UploadContainer.Add(widget.NewButtonWithIcon("指定接收上传文件目录", theme.FolderIcon(), func() {
 	//	logger.Debug("选择文件目录")
 	//}))

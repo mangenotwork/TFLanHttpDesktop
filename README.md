@@ -11,7 +11,6 @@ Transfer Files from LAN Http Desktop, 用于局域网内指定文件生成二维
 - 设定密码，一次性下载等功能
 
 #### todo
-- 数据存储实现
 - 嵌入html实现
 - 选择下载文件界面与功能
 - 选择上传路径界面与功能

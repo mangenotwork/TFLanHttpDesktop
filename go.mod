@@ -6,6 +6,7 @@ toolchain go1.24.6
 
 require (
 	fyne.io/fyne/v2 v2.6.3
+	github.com/boltdb/bolt v1.3.1
 	github.com/gin-contrib/gzip v1.2.3
 	github.com/gin-gonic/gin v1.10.1
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e

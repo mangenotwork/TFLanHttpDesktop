@@ -214,3 +214,26 @@
 2025-08-27 10:34:36.523 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
 2025-08-27 10:34:36.947 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
 2025-08-27 10:34:36.983 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:57:23.325 [DEBUG] internal/ui/base.go:280 	| 刷新
+2025-08-27 11:27:21.944 [DEBUG] mangenotwork/TFLanHttpDesktop/main.go:34 	| 初始化DB
+2025-08-27 11:27:21.944 [DEBUG] mangenotwork/TFLanHttpDesktop/main.go:37 	| 应用数据文件: C:\Users\Administrator\AppData\Roaming\TFLanHttpDesktop
+2025-08-27 11:27:22.227 [INFO]  internal/server/base.go:25 	| 局域网ip 10.0.40.203
+2025-08-27 11:27:22.227 [INFO]  internal/server/base.go:30 	| http服务启动 http://10.0.40.203:60968/health
+2025-08-27 11:27:22.870 [DEBUG] internal/ui/base.go:24 	| 初始化UI
+2025-08-27 11:27:23.500 [DEBUG] internal/ui/base.go:44 	| Lifecycle: Entered Foreground
+2025-08-27 11:27:23.542 [DEBUG] internal/ui/base.go:38 	| Lifecycle: Started
+2025-08-27 11:27:42.220 [INFO]  internal/server/router.go:67 	|  200 |       574.9µs |     10.0.40.203 | GET | /health 
+2025-08-27 11:27:42.284 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 11:27:43.155 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 11:27:43.193 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 11:27:43.508 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 11:27:43.551 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 11:27:43.824 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 11:27:43.862 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 11:27:44.402 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 11:27:44.439 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 11:27:46.239 [DEBUG] internal/ui/base.go:47 	| Lifecycle: Exited Foreground
+2025-08-27 11:27:49.054 [DEBUG] internal/ui/base.go:57 	| System tray menu tapped
+2025-08-27 11:27:52.957 [DEBUG] internal/ui/base.go:57 	| System tray menu tapped
+2025-08-27 11:27:55.461 [DEBUG] internal/ui/base.go:57 	| System tray menu tapped
+2025-08-27 11:27:58.309 [DEBUG] internal/ui/base.go:41 	| Lifecycle: Stopped
