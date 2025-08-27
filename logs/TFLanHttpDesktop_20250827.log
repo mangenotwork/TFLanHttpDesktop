@@ -183,3 +183,34 @@
 2025-08-27 10:33:59.764 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
 2025-08-27 10:34:00.031 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
 2025-08-27 10:34:00.065 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:34:19.802 [INFO]  internal/server/base.go:25 	| 局域网ip 10.0.40.203
+2025-08-27 10:34:19.802 [INFO]  internal/server/base.go:30 	| http服务启动 http://10.0.40.203:53784/health
+2025-08-27 10:34:19.832 [DEBUG] internal/ui/base.go:23 	| 初始化UI
+2025-08-27 10:34:32.350 [INFO]  internal/server/router.go:67 	|  200 |       505.7µs |     10.0.40.203 | GET | /health 
+2025-08-27 10:34:32.395 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:34:33.612 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:34:33.648 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:34:33.945 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:34:33.981 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:34:34.205 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:34:34.240 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:34:34.479 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:34:34.513 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:34:34.739 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:34:34.771 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:34:34.995 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:34:35.029 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:34:35.248 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:34:35.284 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:34:35.493 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:34:35.527 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:34:35.748 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:34:35.781 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:34:36.004 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:34:36.039 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:34:36.256 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:34:36.295 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:34:36.490 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:34:36.523 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:34:36.947 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:34:36.983 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
