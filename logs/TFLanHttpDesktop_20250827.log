@@ -1,0 +1,185 @@
+2025-08-27 10:07:38.018 [INFO]  internal/server/base.go:33 	| http服务启动 0.0.0.0:50067
+2025-08-27 10:07:49.860 [INFO]  internal/server/base.go:44 	| 开始关闭服务器...
+2025-08-27 10:07:49.860 [INFO]  internal/server/base.go:51 	| 服务器已退出
+2025-08-27 10:07:49.860 [ERROR] internal/server/base.go:37 	| http服务出现异常:http: Server closed
+
+2025-08-27 10:07:49.905 [DEBUG] internal/ui/base.go:23 	| 初始化UI
+2025-08-27 10:09:13.666 [INFO]  internal/server/base.go:33 	| http服务启动 0.0.0.0:50306
+2025-08-27 10:09:25.051 [INFO]  internal/server/base.go:44 	| 开始关闭服务器...
+2025-08-27 10:09:25.052 [ERROR] internal/server/base.go:37 	| http服务出现异常:http: Server closed
+
+2025-08-27 10:09:25.052 [INFO]  internal/server/base.go:51 	| 服务器已退出
+2025-08-27 10:09:25.087 [DEBUG] internal/ui/base.go:23 	| 初始化UI
+2025-08-27 10:09:55.890 [INFO]  internal/server/base.go:34 	| http服务启动 0.0.0.0:50377
+2025-08-27 10:09:55.925 [DEBUG] internal/ui/base.go:23 	| 初始化UI
+2025-08-27 10:10:08.634 [INFO]  internal/server/base.go:34 	| http服务启动 0.0.0.0:50393
+2025-08-27 10:10:08.669 [DEBUG] internal/ui/base.go:23 	| 初始化UI
+2025-08-27 10:10:31.120 [INFO]  internal/server/base.go:34 	| http服务启动 0.0.0.0:50422
+2025-08-27 10:10:31.155 [DEBUG] internal/ui/base.go:23 	| 初始化UI
+2025-08-27 10:13:22.380 [INFO]  internal/server/base.go:34 	| http服务启动 0.0.0.0:50965
+2025-08-27 10:13:22.412 [DEBUG] internal/ui/base.go:23 	| 初始化UI
+2025-08-27 10:14:04.083 [INFO]  internal/server/base.go:44 	| 开始关闭服务器...
+2025-08-27 10:14:04.083 [ERROR] internal/server/base.go:37 	| http服务出现异常:http: Server closed
+
+2025-08-27 10:14:04.083 [INFO]  internal/server/base.go:51 	| 服务器已退出
+2025-08-27 10:14:10.203 [INFO]  internal/server/base.go:34 	| http服务启动 0.0.0.0:51053
+2025-08-27 10:15:11.091 [INFO]  internal/server/base.go:44 	| 开始关闭服务器...
+2025-08-27 10:15:11.091 [ERROR] internal/server/base.go:37 	| http服务出现异常:http: Server closed
+
+2025-08-27 10:15:11.091 [INFO]  internal/server/base.go:51 	| 服务器已退出
+2025-08-27 10:15:16.171 [INFO]  internal/server/base.go:34 	| http服务启动 0.0.0.0:51160
+2025-08-27 10:16:37.436 [INFO]  internal/server/base.go:44 	| 开始关闭服务器...
+2025-08-27 10:16:37.436 [ERROR] internal/server/base.go:37 	| http服务出现异常:http: Server closed
+
+2025-08-27 10:16:37.436 [INFO]  internal/server/base.go:51 	| 服务器已退出
+2025-08-27 10:16:42.287 [INFO]  internal/server/base.go:34 	| http服务启动 0.0.0.0:19999
+2025-08-27 10:17:26.146 [INFO]  internal/server/base.go:44 	| 开始关闭服务器...
+2025-08-27 10:17:26.147 [INFO]  internal/server/base.go:51 	| 服务器已退出
+2025-08-27 10:18:36.763 [INFO]  internal/server/base.go:43 	| 开始关闭服务器...
+2025-08-27 10:18:36.763 [INFO]  internal/server/base.go:50 	| 服务器已退出
+2025-08-27 10:20:14.748 [INFO]  internal/server/base.go:44 	| 开始关闭服务器...
+2025-08-27 10:20:14.748 [INFO]  internal/server/base.go:51 	| 服务器已退出
+2025-08-27 10:21:25.938 [INFO]  internal/server/base.go:44 	| 开始关闭服务器...
+2025-08-27 10:21:25.938 [INFO]  internal/server/base.go:51 	| 服务器已退出
+2025-08-27 10:22:51.667 [INFO]  internal/server/base.go:44 	| 开始关闭服务器...
+2025-08-27 10:22:51.667 [INFO]  internal/server/base.go:51 	| 服务器已退出
+2025-08-27 10:23:05.710 [INFO]  internal/server/router.go:67 	|  404 |            0s |       127.0.0.1 | POST | /health 
+2025-08-27 10:23:09.978 [INFO]  internal/server/router.go:67 	|  404 |            0s |       127.0.0.1 | POST | /health 
+2025-08-27 10:23:10.878 [INFO]  internal/server/router.go:67 	|  404 |            0s |       127.0.0.1 | POST | /health 
+2025-08-27 10:23:19.916 [INFO]  internal/server/router.go:67 	|  200 |            0s |       127.0.0.1 | GET | /health 
+2025-08-27 10:23:20.020 [INFO]  internal/server/router.go:67 	|  404 |            0s |       127.0.0.1 | GET | /favicon.ico 
+2025-08-27 10:23:21.023 [INFO]  internal/server/router.go:67 	|  200 |            0s |       127.0.0.1 | GET | /health 
+2025-08-27 10:23:21.063 [INFO]  internal/server/router.go:67 	|  404 |            0s |       127.0.0.1 | GET | /favicon.ico 
+2025-08-27 10:23:21.438 [INFO]  internal/server/router.go:67 	|  200 |            0s |       127.0.0.1 | GET | /health 
+2025-08-27 10:23:21.470 [INFO]  internal/server/router.go:67 	|  404 |            0s |       127.0.0.1 | GET | /favicon.ico 
+2025-08-27 10:23:21.735 [INFO]  internal/server/router.go:67 	|  200 |            0s |       127.0.0.1 | GET | /health 
+2025-08-27 10:23:21.769 [INFO]  internal/server/router.go:67 	|  404 |            0s |       127.0.0.1 | GET | /favicon.ico 
+2025-08-27 10:23:22.032 [INFO]  internal/server/router.go:67 	|  200 |            0s |       127.0.0.1 | GET | /health 
+2025-08-27 10:23:22.063 [INFO]  internal/server/router.go:67 	|  404 |            0s |       127.0.0.1 | GET | /favicon.ico 
+2025-08-27 10:23:22.327 [INFO]  internal/server/router.go:67 	|  200 |            0s |       127.0.0.1 | GET | /health 
+2025-08-27 10:23:22.360 [INFO]  internal/server/router.go:67 	|  404 |            0s |       127.0.0.1 | GET | /favicon.ico 
+2025-08-27 10:24:04.986 [INFO]  internal/server/base.go:44 	| 开始关闭服务器...
+2025-08-27 10:24:04.986 [ERROR] internal/server/base.go:37 	| http服务出现异常:http: Server closed
+
+2025-08-27 10:24:04.986 [INFO]  internal/server/base.go:51 	| 服务器已退出
+2025-08-27 10:24:10.047 [INFO]  internal/server/base.go:34 	| http服务启动 0.0.0.0:52352
+2025-08-27 10:25:54.426 [INFO]  internal/server/base.go:45 	| 开始关闭服务器...
+2025-08-27 10:25:54.426 [ERROR] internal/server/base.go:38 	| http服务出现异常:http: Server closed
+
+2025-08-27 10:25:54.426 [INFO]  internal/server/base.go:52 	| 服务器已退出
+2025-08-27 10:25:59.814 [INFO]  internal/server/base.go:25 	| http服务启动 :::52566
+2025-08-27 10:26:14.155 [INFO]  internal/server/router.go:67 	|  200 |            0s |       127.0.0.1 | GET | /health 
+2025-08-27 10:26:14.189 [INFO]  internal/server/router.go:67 	|  404 |            0s |       127.0.0.1 | GET | /favicon.ico 
+2025-08-27 10:26:14.860 [INFO]  internal/server/router.go:67 	|  200 |            0s |       127.0.0.1 | GET | /health 
+2025-08-27 10:26:14.897 [INFO]  internal/server/router.go:67 	|  404 |            0s |       127.0.0.1 | GET | /favicon.ico 
+2025-08-27 10:26:15.193 [INFO]  internal/server/router.go:67 	|  200 |            0s |       127.0.0.1 | GET | /health 
+2025-08-27 10:26:15.227 [INFO]  internal/server/router.go:67 	|  404 |            0s |       127.0.0.1 | GET | /favicon.ico 
+2025-08-27 10:26:15.470 [INFO]  internal/server/router.go:67 	|  200 |            0s |       127.0.0.1 | GET | /health 
+2025-08-27 10:26:15.503 [INFO]  internal/server/router.go:67 	|  404 |            0s |       127.0.0.1 | GET | /favicon.ico 
+2025-08-27 10:26:15.751 [INFO]  internal/server/router.go:67 	|  200 |            0s |       127.0.0.1 | GET | /health 
+2025-08-27 10:26:15.777 [INFO]  internal/server/router.go:67 	|  404 |            0s |       127.0.0.1 | GET | /favicon.ico 
+2025-08-27 10:26:16.014 [INFO]  internal/server/router.go:67 	|  200 |            0s |       127.0.0.1 | GET | /health 
+2025-08-27 10:26:16.048 [INFO]  internal/server/router.go:67 	|  404 |            0s |       127.0.0.1 | GET | /favicon.ico 
+2025-08-27 10:26:16.358 [INFO]  internal/server/router.go:67 	|  200 |            0s |       127.0.0.1 | GET | /health 
+2025-08-27 10:26:16.391 [INFO]  internal/server/router.go:67 	|  404 |            0s |       127.0.0.1 | GET | /favicon.ico 
+2025-08-27 10:26:16.671 [INFO]  internal/server/router.go:67 	|  200 |            0s |       127.0.0.1 | GET | /health 
+2025-08-27 10:26:16.704 [INFO]  internal/server/router.go:67 	|  404 |            0s |       127.0.0.1 | GET | /favicon.ico 
+2025-08-27 10:26:17.170 [INFO]  internal/server/router.go:67 	|  200 |            0s |       127.0.0.1 | GET | /health 
+2025-08-27 10:26:17.214 [INFO]  internal/server/router.go:67 	|  404 |            0s |       127.0.0.1 | GET | /favicon.ico 
+2025-08-27 10:26:17.489 [INFO]  internal/server/router.go:67 	|  200 |            0s |       127.0.0.1 | GET | /health 
+2025-08-27 10:26:17.526 [INFO]  internal/server/router.go:67 	|  404 |            0s |       127.0.0.1 | GET | /favicon.ico 
+2025-08-27 10:28:43.922 [INFO]  internal/server/base.go:44 	| 开始关闭服务器...
+2025-08-27 10:28:43.922 [ERROR] internal/server/base.go:37 	| http服务出现异常:http: Server closed
+
+2025-08-27 10:28:43.922 [INFO]  internal/server/base.go:51 	| 服务器已退出
+2025-08-27 10:28:49.176 [INFO]  internal/server/base.go:26 	| http服务启动 :::53000
+2025-08-27 10:28:49.181 [INFO]  internal/server/base.go:29 	| 局域网ip 10.0.40.203
+2025-08-27 10:29:04.728 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:29:04.777 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:29:05.357 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:29:05.391 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:29:05.678 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:29:05.711 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:29:05.990 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:29:06.022 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:29:06.246 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:29:06.284 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:31:53.682 [INFO]  internal/server/base.go:48 	| 开始关闭服务器...
+2025-08-27 10:31:53.682 [ERROR] internal/server/base.go:41 	| http服务出现异常:http: Server closed
+
+2025-08-27 10:31:53.682 [INFO]  internal/server/base.go:55 	| 服务器已退出
+2025-08-27 10:31:58.850 [INFO]  internal/server/base.go:28 	| 局域网ip 10.0.40.203
+2025-08-27 10:31:58.850 [INFO]  internal/server/base.go:33 	| http服务启动 http://10.0.40.203:53372/health
+2025-08-27 10:32:11.143 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:32:11.183 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:32:11.851 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:32:11.881 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:32:12.334 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:32:12.365 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:32:12.719 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:32:12.751 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:32:13.062 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:32:13.098 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:32:29.937 [INFO]  internal/server/base.go:52 	| 开始关闭服务器...
+2025-08-27 10:32:29.937 [ERROR] internal/server/base.go:45 	| http服务出现异常:http: Server closed
+
+2025-08-27 10:32:29.937 [INFO]  internal/server/base.go:59 	| 服务器已退出
+2025-08-27 10:32:35.101 [INFO]  internal/server/base.go:28 	| 局域网ip 10.0.40.203
+2025-08-27 10:32:35.101 [INFO]  internal/server/base.go:33 	| http服务启动 http://10.0.40.203:53453/health
+2025-08-27 10:32:59.970 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:33:00.029 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:33:00.556 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:33:00.590 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:33:00.856 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:33:00.890 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:33:01.144 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:33:01.178 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:33:01.404 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:33:01.438 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:33:01.659 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:33:01.693 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:33:01.918 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:33:01.953 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:33:02.158 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:33:02.191 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:33:02.411 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:33:02.444 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:33:02.637 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:33:02.889 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:33:03.040 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:33:03.110 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:33:03.146 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:33:03.367 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:33:03.400 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:33:03.617 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:33:03.654 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:33:03.878 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:33:03.914 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:33:04.091 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:33:04.124 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:33:04.484 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:33:04.511 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:33:46.618 [INFO]  internal/server/base.go:52 	| 开始关闭服务器...
+2025-08-27 10:33:46.618 [ERROR] internal/server/base.go:45 	| http服务出现异常:http: Server closed
+
+2025-08-27 10:33:46.618 [INFO]  internal/server/base.go:59 	| 服务器已退出
+2025-08-27 10:33:51.665 [INFO]  internal/server/base.go:25 	| 局域网ip 10.0.40.203
+2025-08-27 10:33:51.665 [INFO]  internal/server/base.go:30 	| http服务启动 http://10.0.40.203:53733/health
+2025-08-27 10:33:57.550 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:33:57.582 [INFO]  internal/server/router.go:67 	|  404 |       557.4µs |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:33:58.084 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:33:58.113 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:33:58.359 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:33:58.391 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:33:58.629 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:33:58.661 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:33:58.908 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:33:58.943 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:33:59.204 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:33:59.242 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:33:59.477 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:33:59.518 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:33:59.732 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:33:59.764 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
+2025-08-27 10:34:00.031 [INFO]  internal/server/router.go:67 	|  200 |            0s |     10.0.40.203 | GET | /health 
+2025-08-27 10:34:00.065 [INFO]  internal/server/router.go:67 	|  404 |            0s |     10.0.40.203 | GET | /favicon.ico 
