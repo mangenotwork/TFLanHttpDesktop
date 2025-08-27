@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件上传 - 修复重复选择问题</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="/tailwindcss"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        danger: '#ef4444',
+                        success: '#10b981',
+                    },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen p-4 sm:p-6">
+<div class="max-w-2xl mx-auto mt-10">
+    <!-- 上传卡片 -->
+    <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-5 sm:p-6">
+        <!-- 标题区域 -->
+        <div class="flex items-center gap-4 mb-5">
+            <div>
+                <h1 class="text-xl sm:text-2xl font-semibold text-gray-800">文件上传</h1>
+            </div>
+        </div>
+
+        <!-- 上传密码区域 -->
+        <div class="mb-6">
+            <p class="text-sm text-gray-600 mb-2 flex items-center">
+                <i class="fa fa-lock text-primary mr-1"></i>
+                上传需要验证密码
+            </p>
+            <input
+                    type="password"
+                    id="uploadPassword"
+                    placeholder="请输入上传密码"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition"
+            >
+            <p id="passwordError" class="text-danger text-xs mt-1 hidden">密码错误，请重新输入</p>
+        </div>
+
+        <!-- 选择文件区域 -->
+        <div class="mb-6">
+            <p class="text-sm text-gray-600 mb-2 flex items-center">
+                选择文件
+            </p>
+            <!-- 关键：将label和dropArea分离，避免事件冒泡冲突 -->
+            <div id="dropArea" class="w-full px-4 py-4 border-2 border-dashed border-gray-300 rounded-lg text-center cursor-pointer hover:border-primary hover:bg-blue-50 transition-all duration-200">
+                <i class="fa fa-plus-circle text-primary mb-2"></i>
+                <span class="text-gray-600">点击或拖拽文件到此处</span>
+                <!-- 隐藏的文件选择框 -->
+                <input
+                        type="file"
+                        id="fileInput"
+                        multiple
+                        class="hidden"
+                >
+            </div>
+        </div>
+
+        <!-- 已选文件列表 -->
+        <div id="fileList" class="mb-6 hidden">
+            <p class="text-sm text-gray-600 mb-2 flex items-center">
+                <i class="fa fa-list text-primary mr-1"></i>
+                已选择的文件 <span id="fileCount" class="ml-1 text-xs bg-gray-100 px-2 py-0.5 rounded">0个</span>
+            </p>
+            <!-- 列表标题行 -->
+            <div class="hidden sm:flex text-xs text-gray-500 border-b border-gray-100 pb-1 mb-1">
+                <div class="w-[calc(100%-80px)]">文件名</div>
+                <div class="w-24 text-right">大小</div>
+                <div class="w-16 text-center">操作</div>
+            </div>
+            <!-- 文件列表容器 -->
+            <div id="selectedFiles" class="border border-gray-100 rounded-lg max-h-40 overflow-y-auto divide-y divide-gray-50">
+                <!-- 文件项将通过JS动态生成 -->
+            </div>
+        </div>
+
+        <!-- 上传按钮 -->
+        <div class="pt-4 border-t border-gray-100">
+            <button id="uploadBtn" class="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white py-3 px-6 rounded-lg flex items-center justify-center gap-2 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                <i class="fa fa-upload"></i>
+                <span>上传文件</span>
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // 实际应用中应从后端获取正确密码
+    const correctPassword = "123456";
+
+    // DOM元素
+    const elements = {
+        uploadBtn: document.getElementById('uploadBtn'),
+        passwordInput: document.getElementById('uploadPassword'),
+        passwordError: document.getElementById('passwordError'),
+        fileInput: document.getElementById('fileInput'),
+        fileList: document.getElementById('fileList'),
+        selectedFiles: document.getElementById('selectedFiles'),
+        fileCount: document.getElementById('fileCount'),
+        dropArea: document.getElementById('dropArea')
+    };
+
+    // 已选择的文件数组
+    let files = [];
+    // 标记是否正在处理文件选择，防止重复触发
+    let isProcessingFile = false;
+
+    // 初始化事件监听
+    function initEvents() {
+        // 1. 文件选择事件（仅绑定一次）
+        elements.fileInput.addEventListener('change', handleFileInputChange);
+
+        // 2. 拖拽事件
+        elements.dropArea.addEventListener('dragover', handleDragOver);
+        elements.dropArea.addEventListener('dragleave', handleDragLeave);
+        elements.dropArea.addEventListener('drop', handleDrop);
+
+        // 3. 点击上传区域触发文件选择（关键：严格控制触发条件）
+        elements.dropArea.addEventListener('click', handleDropAreaClick);
+
+        // 4. 上传按钮事件
+        elements.uploadBtn.addEventListener('click', handleUpload);
+
+        // 5. 密码输入事件
+        elements.passwordInput.addEventListener('input', handlePasswordInput);
+
+        // 6. 删除按钮事件委托（使用捕获阶段避免冲突）
+        elements.selectedFiles.addEventListener('click', handleDeleteClick, true);
+    }
+
+    // 处理文件选择框变化
+    function handleFileInputChange(e) {
+        // 防止重复处理
+        if (isProcessingFile) return;
+
+        isProcessingFile = true;
+        const selectedFiles = e.target.files;
+
+        if (selectedFiles.length > 0) {
+            handleFiles(selectedFiles);
+        }
+
+        // 重置选择框（延迟执行，确保文件处理完成）
+        setTimeout(() => {
+            elements.fileInput.value = '';
+            isProcessingFile = false;
+        }, 100);
+    }
+
+    // 处理拖拽悬停
+    function handleDragOver(e) {
+        e.preventDefault();
+        elements.dropArea.classList.add('border-primary', 'bg-blue-50');
+    }
+
+    // 处理拖拽离开
+    function handleDragLeave() {
+        elements.dropArea.classList.remove('border-primary', 'bg-blue-50');
+    }
+
+    // 处理拖拽释放
+    function handleDrop(e) {
+        e.preventDefault();
+        elements.dropArea.classList.remove('border-primary', 'bg-blue-50');
+
+        // 防止与点击事件冲突
+        if (isProcessingFile) return;
+
+        const droppedFiles = e.dataTransfer.files;
+        if (droppedFiles.length > 0) {
+            handleFiles(droppedFiles);
+        }
+    }
+
+    // 处理上传区域点击（关键修复）
+    function handleDropAreaClick(e) {
+        // 防止事件冒泡和重复触发
+        e.stopPropagation();
+
+        // 只有点击的是dropArea本身且没有正在处理文件时才触发
+        if (e.target === elements.dropArea || elements.dropArea.contains(e.target) && !isProcessingFile) {
+            elements.fileInput.click();
+        }
+    }
+
+    // 处理密码输入
+    function handlePasswordInput() {
+        elements.passwordError.classList.add('hidden');
+        elements.passwordInput.classList.remove('border-danger');
+    }
+
+    // 处理删除点击
+    function handleDeleteClick(e) {
+        const deleteBtn = e.target.closest('.delete-btn');
+        if (deleteBtn) {
+            e.stopPropagation(); // 阻止事件冒泡到dropArea
+            const index = parseInt(deleteBtn.dataset.index);
+            deleteFile(index);
+        }
+    }
+
+    // 处理选择的文件
+    function handleFiles(selectedFiles) {
+        const newFiles = Array.from(selectedFiles).filter(file => {
+            return !files.some(f =>
+                f.name === file.name &&
+                f.size === file.size &&
+                f.lastModified === file.lastModified
+            );
+        });
+
+        if (newFiles.length > 0) {
+            files = [...files, ...newFiles];
+            renderFileList();
+            updateFileListVisibility();
+        }
+    }
+
+    // 渲染文件列表
+    function renderFileList() {
+        elements.selectedFiles.innerHTML = '';
+        elements.fileCount.textContent = files.length + '个';
+
+        files.forEach((file, index) => {
+            const fileSize = formatFileSize(file.size);
+
+            const fileItem = document.createElement('div');
+            fileItem.className = 'flex items-center py-3 px-2 hover:bg-gray-50 transition-colors';
+            fileItem.innerHTML =
+                '<div class="flex items-center w-[calc(100%-80px)]">' +
+                '<div class="min-w-0">' +
+                '<p class="text-sm text-gray-800 truncate" title="' + file.name + '">' + file.name + '</p>' +
+                '<p class="text-xs text-gray-500 sm:hidden">' + fileSize + '</p>' +
+                '</div>' +
+                '</div>' +
+                '<div class="w-24 text-right hidden sm:block">' +
+                '<span class="text-xs text-gray-500">' + fileSize + '</span>' +
+                '</div>' +
+                '<div class="w-16 flex justify-center">' +
+                '<button type="button" class="delete-btn text-gray-400 hover:text-danger p-1.5 transition-colors"' +
+                'data-index="' + index + '" title="删除">' +
+                '删除' +
+                '</button>' +
+                '</div>';
+
+            elements.selectedFiles.appendChild(fileItem);
+        });
+    }
+
+    // 删除指定文件
+    function deleteFile(index) {
+        files.splice(index, 1);
+        renderFileList();
+        updateFileListVisibility();
+    }
+
+    // 更新文件列表显示状态
+    function updateFileListVisibility() {
+        if (files.length > 0) {
+            elements.fileList.classList.remove('hidden');
+            elements.uploadBtn.disabled = false;
+        } else {
+            elements.fileList.classList.add('hidden');
+            elements.uploadBtn.disabled = true;
+        }
+    }
+
+    // 格式化文件大小
+    function formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / 1048576).toFixed(1) + ' MB';
+    }
+
+
+    // 处理上传
+    function handleUpload() {
+        const password = elements.passwordInput.value.trim();
+
+        if (!password) {
+            elements.passwordError.textContent = '请输入上传密码';
+            elements.passwordError.classList.remove('hidden');
+            elements.passwordInput.classList.add('border-danger');
+            return;
+        }
+
+        if (password !== correctPassword) {
+            elements.passwordError.textContent = '密码错误，请重新输入';
+            elements.passwordError.classList.remove('hidden');
+            elements.passwordInput.classList.add('border-danger');
+            return;
+        }
+
+        const originalText = elements.uploadBtn.innerHTML;
+        elements.uploadBtn.disabled = true;
+        elements.uploadBtn.innerHTML = '<span>上传中...</span>';
+
+        setTimeout(() => {
+            elements.uploadBtn.innerHTML = '<span>上传成功</span>';
+            elements.uploadBtn.classList.remove('bg-primary');
+            elements.uploadBtn.classList.add('bg-success');
+
+            files = [];
+            renderFileList();
+            updateFileListVisibility();
+
+            setTimeout(() => {
+                elements.uploadBtn.innerHTML = originalText;
+                elements.uploadBtn.classList.remove('bg-success');
+                elements.uploadBtn.classList.add('bg-primary');
+            }, 2000);
+        }, 1500);
+    }
+
+    // 初始化（只执行一次）
+    document.addEventListener('DOMContentLoaded', initEvents);
+</script>
+</body>
+</html>

@@ -3,10 +3,13 @@ package main
 import (
 	"TFLanHttpDesktop/common/define"
 	"TFLanHttpDesktop/common/logger"
+	"TFLanHttpDesktop/common/utils"
 	"TFLanHttpDesktop/internal/data"
 	"TFLanHttpDesktop/internal/server"
 	"TFLanHttpDesktop/internal/ui"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"net"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -24,7 +27,23 @@ func init() {
 func main() {
 
 	// 初始化http服务
-	server.InitHttpServer()
+	listener, err := net.Listen("tcp", "0.0.0.0:0") // 关键：绑定0.0.0.0确保外部可访问
+	if err != nil {
+		logger.ErrorF("创建监听器失败: %s", err.Error())
+		return
+	}
+
+	addr := listener.Addr().(*net.TCPAddr)
+	actualPort := addr.Port
+
+	lanIp, _ := utils.GetLocalIP()
+	logger.Info("局域网ip ", lanIp)
+
+	define.HttpPort = actualPort
+	define.LanIP = lanIp
+	define.DoMain = fmt.Sprintf("http://%s:%d", define.LanIP, define.HttpPort)
+	logger.InfoF("http服务启动 %s/health", define.DoMain)
+	server.InitHttpServer(listener)
 
 	// 初始化ui
 	ui.InitUI()

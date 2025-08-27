@@ -1,0 +1,93 @@
+package assets
+
+var MemoPg = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简约备忘录</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="/tailwindcss"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        neutral: '#f9fafb',
+                    },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen p-4 sm:p-6">
+<!-- 主容器 -->
+<div class="max-w-2xl mx-auto mt-8">
+    <!-- 备忘录卡片 -->
+    <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-5 sm:p-6">
+        <!-- 标题区域 -->
+        <div class="flex items-center gap-3 mb-5">
+            <h1 class="text-lg sm:text-xl font-semibold text-gray-800">备忘录标题</h1>
+        </div>
+
+
+        <!-- 备忘录内容输入 -->
+        <div class="mb-4">
+                <textarea
+                        id="noteContent"
+                        placeholder="输入内容..."
+                        rows="36"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition resize-none"
+                ></textarea>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="flex justify-end gap-3">
+            <button id="clearBtn" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors">
+                <i class="fa fa-trash-o mr-1"></i> 清空
+            </button>
+            <button id="saveBtn" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                <i class="fa fa-save mr-1"></i> 保存
+            </button>
+        </div>
+
+        <!-- 底部提示 -->
+        <p class="text-center text-gray-500 text-xs mt-4">
+            TFLanHttpDesktop v0.1
+        </p>
+    </div>
+</div>
+
+<script>
+    // DOM元素
+    const noteTitle = document.getElementById('noteTitle');
+    const noteContent = document.getElementById('noteContent');
+
+    // 页面加载时读取本地保存的内容
+    window.addEventListener('load', function() {
+        const savedNote = localStorage.getItem('simpleNote');
+        if (savedNote) {
+            const { title, content } = JSON.parse(savedNote);
+            noteTitle.value = title || '';
+            noteContent.value = content || '';
+        }
+    });
+
+    // 自动保存函数（输入变化时触发）
+    function autoSaveNote() {
+        const noteData = {
+            title: noteTitle.value.trim(),
+            content: noteContent.value.trim()
+        };
+        // 保存到浏览器本地存储
+        localStorage.setItem('simpleNote', JSON.stringify(noteData));
+    }
+
+    // 为标题和内容输入框绑定自动保存事件
+    noteTitle.addEventListener('input', autoSaveNote);
+    noteContent.addEventListener('input', autoSaveNote);
+</script>
+</body>
+</html>`

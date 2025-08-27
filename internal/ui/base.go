@@ -1,9 +1,11 @@
 package ui
 
 import (
+	"TFLanHttpDesktop/common/define"
 	"TFLanHttpDesktop/common/logger"
 	"TFLanHttpDesktop/common/utils"
 	"bytes"
+	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/canvas"
@@ -79,7 +81,7 @@ func MainContent() *container.Split {
 	//DownloadContainer.Add(widget.NewButtonWithIcon("选择文件", theme.FileIcon(), func() {
 	//	logger.Debug("选择文件")
 	//}))
-	qrImg, _ := utils.GetQRCodeIO("https://www.baidu.com/")
+	qrImg, _ := utils.GetQRCodeIO(fmt.Sprintf("%s/debug/download", define.DoMain))
 	reader := bytes.NewReader(qrImg)
 	DownloadQr := canvas.NewImageFromReader(reader, "移动设备扫码下载")
 	DownloadQr.FillMode = canvas.ImageFillOriginal
@@ -149,7 +151,7 @@ func MainContent() *container.Split {
 	//UploadContainer.Add(widget.NewButtonWithIcon("指定接收上传文件目录", theme.FolderIcon(), func() {
 	//	logger.Debug("选择文件目录")
 	//}))
-	qrImgUpload, _ := utils.GetQRCodeIO("https://www.baidu.com/")
+	qrImgUpload, _ := utils.GetQRCodeIO(fmt.Sprintf("%s/debug/upload", define.DoMain))
 	readerUpload := bytes.NewReader(qrImgUpload)
 	UploadQr := canvas.NewImageFromReader(readerUpload, "移动设备扫码上传")
 	UploadQr.FillMode = canvas.ImageFillOriginal

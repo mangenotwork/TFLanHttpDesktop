@@ -14,7 +14,11 @@ var Router *gin.Engine
 
 func Routers() *gin.Engine {
 	Router.Use(gzip.Gzip(gzip.DefaultCompression), CorsHandler(), Base())
-	Router.Any("/health", Health)
+	Router.GET("/health", Health)
+	Router.GET("/debug/download", DebugDownloadPg)
+	Router.GET("/debug/upload", DebugUploadPg)
+	Router.GET("/debug/memo", DebugMemoPg)
+	Router.GET("/tailwindcss", Tailwindcss)
 	return Router
 }
 
