@@ -11,12 +11,11 @@ type DownloadNow struct {
 
 // DownloadLog 下载的日志 key是时间戳
 type DownloadLog struct {
-	Time      int64  // 请求的时间 时间戳
+	Time      string // 请求的时间 时间戳
 	IP        string // 请求端ip
 	UserAgent string // 请求端的user-agent
 	Path      string // 下载文件的路径
-	File      string // 下载的文件
-	FileInfo  string // 下载的文件的信息
+	Size      string // 下载的文件的信息
 }
 
 // UploadNow 当前上传的路径
@@ -28,12 +27,11 @@ type UploadNow struct {
 
 // UploadLog 上传的日志 key是时间戳
 type UploadLog struct {
-	Time      int64  // 请求的时间 时间戳
+	Time      string // 请求的时间 时间戳
 	IP        string // 请求端ip
 	UserAgent string // 请求端的user-agent
 	Path      string // 上传文件的路径
-	File      string // 上传的文件
-	FileInfo  string // 上传的文件的信息
+	Size      string // 上传的文件的信息
 }
 
 // Memo 备忘录  key是备忘录id

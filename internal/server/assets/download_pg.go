@@ -36,16 +36,15 @@ var DownloadPg = `
         <!-- 核心文件信息 -->
         <div class="grid grid-cols-2 gap-4 mb-6 text-sm">
             <div class="flex items-center gap-2 text-gray-600">
-                <i class="fa fa-hdd-o text-gray-400"></i>
                 <span>大小: {{.FileSize}}</span>
             </div>
             <div class="flex items-center gap-2 text-gray-600">
-                <i class="fa fa-file-text-o text-gray-400"></i>
-                <span>格式: {{.Ext}}</span>
+                <span></span>
             </div>
         </div>
 
         <!-- 密码输入区域 -->
+		{{ if eq .IsPassword 1 }}
         <div class="mb-6">
             <p class="text-sm text-gray-600 mb-2 flex items-center">
                 <i class="fa fa-lock text-primary mr-1"></i>
@@ -61,6 +60,7 @@ var DownloadPg = `
             </div>
             <p id="passwordError" class="text-danger text-xs mt-1 hidden">密码错误，请重新输入</p>
         </div>
+		{{ end }}
 
         <!-- 下载按钮 -->
         <div class="pt-4 border-t border-gray-100">
@@ -78,30 +78,26 @@ var DownloadPg = `
 </div>
 
 <script>
-    // 实际应用中应从后端获取正确密码（此处仅为示例）
-    const correctPassword = "123456"; // 替换为实际密码验证逻辑
-
     const downloadBtn = document.getElementById('downloadBtn');
     const passwordInput = document.getElementById('downloadPassword');
     const passwordError = document.getElementById('passwordError');
 
     downloadBtn.addEventListener('click', function(e) {
         e.preventDefault();
-        const password = passwordInput.value.trim();
+        let password = ""
 
-        // 验证密码
-        if (password === '') {
-            showError('请输入下载密码');
-            return;
-        }
+		
+		{{ if eq .IsPassword 1 }}
+			password = passwordInput.value.trim();
+			// 验证密码
+			if (password === '') {
+				showError('请输入下载密码');
+				return;
+			}
+		{{ end }}
 
-        if (password !== correctPassword) {
-            showError('密码错误，请重新输入');
-            return;
-        }
-
-        // 密码正确，执行下载流程
-        startDownload();
+        // 透传密码，执行下载流程 
+        startDownload(password);
     });
 
     // 显示错误提示
@@ -117,17 +113,11 @@ var DownloadPg = `
         }, 3000);
     }
 
-    function startDownload() {
-		window.location.href = '{{.DownloadUrl}}';
+    function startDownload(password) {
+		window.location.href = '{{.DownloadUrl}}?p='+password;
     }
 
-    // 输入密码时清除错误状态
-    passwordInput.addEventListener('input', function() {
-        passwordError.classList.add('hidden');
-        passwordInput.classList.remove('border-danger');
-    });
 </script>
 </body>
 </html>
-
 `

@@ -4,6 +4,7 @@ import (
 	"TFLanHttpDesktop/common/define"
 	"TFLanHttpDesktop/common/logger"
 	"TFLanHttpDesktop/common/utils"
+	"TFLanHttpDesktop/internal/data"
 	"TFLanHttpDesktop/internal/server/assets"
 	"bytes"
 	"compress/gzip"
@@ -16,6 +17,7 @@ import (
 	"net/url"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 func Health(ctx *gin.Context) {
@@ -35,12 +37,24 @@ func DownloadPg(ctx *gin.Context) {
 	filePath, ok := define.DownloadMem[fileKey]
 	if !ok {
 		logger.Debug("file not found")
-		ctx.Data(http.StatusOK, "text/html; charset=utf-8", []byte("下载链接已失效"))
+		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("下载链接已失效"))
 		return
 	}
 	logger.Info(filePath)
 
-	_, _, fileName, ext := utils.ParsePath(filePath)
+	downloadData, _ := data.GetDownloadData()
+	logger.Debug("downloadData = ", downloadData)
+	if downloadData.Path != filePath {
+		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("下载链接已失效"))
+		return
+	}
+
+	isPassword := 0
+	if downloadData.IsPassword {
+		isPassword = 1
+	}
+
+	_, _, fileName, _ := utils.ParsePath(filePath)
 	fileSize, _ := utils.GetFileSize(filePath)
 
 	tpl, err := template.New("html").Parse(assets.DownloadPg)
@@ -50,14 +64,14 @@ func DownloadPg(ctx *gin.Context) {
 		return
 	}
 	var renderedHTML strings.Builder
-	data := map[string]interface{}{
-		"Title":       "下载文件",
+	values := map[string]interface{}{
+		"Title":       "下载-" + fileName,
 		"FileName":    fileName,
-		"Ext":         ext,
 		"FileSize":    fileSize,
 		"DownloadUrl": fmt.Sprintf("%s/d/%s", define.DoMain, fileKey),
+		"IsPassword":  isPassword,
 	}
-	if err := tpl.Execute(&renderedHTML, data); err != nil {
+	if err := tpl.Execute(&renderedHTML, values); err != nil {
 		logger.Error(err)
 		ctx.Data(http.StatusInternalServerError, "text/html; charset=utf-8", []byte(err.Error()))
 		return
@@ -75,13 +89,45 @@ func DownloadExecute(ctx *gin.Context) {
 	filePath, ok := define.DownloadMem[fileKey]
 	if !ok {
 		logger.Debug("file not found")
-		ctx.Data(http.StatusOK, "text/html; charset=utf-8", []byte("下载链接已失效"))
+		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("下载链接已失效"))
 		return
 	}
 	logger.Info(filePath)
 
+	password := ctx.Query("p")
+	logger.InfoF("password = %s", password)
+
+	downloadData, _ := data.GetDownloadData()
+	if downloadData.Path != filePath {
+		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("下载链接已失效"))
+		return
+	}
+	if downloadData.IsPassword && downloadData.Password != password {
+		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("密码错误"))
+		return
+	}
+
+	ua := ctx.Request.UserAgent()
+	ip, _ := ctx.Get(ReqIP)
+	logger.Debug("ua = ", ua)
+	logger.Debug("ip = ", ip)
+	fileSize, _ := utils.GetFileSize(filePath)
+	err := data.SetDownloadLog(&data.DownloadLog{
+		Time:      time.Now().Format(utils.TimeTemplate),
+		IP:        ip.(string),
+		UserAgent: ua,
+		Path:      filePath,
+		Size:      fileSize,
+	})
+	if err != nil {
+		logger.Error("记录下载日志出现错误 ", err)
+	}
+
 	fileName := filepath.Base(filePath)
 	encodedFileName := url.QueryEscape(fileName)
+	ctx.Header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
+	ctx.Header("Pragma", "no-cache") // 兼容HTTP/1.0
+	ctx.Header("Expires", "0")       // 告诉浏览器该资源已过期
 	ctx.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s;", encodedFileName))
 	ctx.Header("Content-Type", "application/octet-stream")
 	ctx.Header("Content-Transfer-Encoding", "binary")

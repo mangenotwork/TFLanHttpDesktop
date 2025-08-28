@@ -270,12 +270,13 @@ func MainContent() *container.Split {
 
 func DownloadContainerShow() {
 	logger.Debug("渲染下载页面 下载文件: ", NowDownloadFilePath)
+	downloadData, _ := data.GetDownloadData()
 	DownloadContainer.RemoveAll()
 	DownloadTitle := canvas.NewText(fmt.Sprintf("下载文件: %s", NowDownloadFilePath), nil)
 	DownloadTitle.TextStyle = fyne.TextStyle{
 		Bold: true,
 	}
-	DownloadTitle.TextSize = 19
+	DownloadTitle.TextSize = 16
 	DownloadTitleContainer := container.NewCenter(DownloadTitle)
 	DownloadContainer.Add(layout.NewSpacer())
 	downloadUrl := ""
@@ -311,15 +312,15 @@ func DownloadContainerShow() {
 			//Icon: theme.NavigateNextIcon(),
 			OnTapped: func() {
 				logger.Debug("复制下载链接")
-				DownloadCopyUrl(downloadUrl)
+				DownloadCopyUrlEvent(downloadUrl)
 			},
 		},
 		&widget.Button{
-			Text: "删除",
+			Text: "删除下载",
 			//Icon: theme.NavigateNextIcon(),
 			OnTapped: func() {
 				logger.Debug("删除下载")
-				// todo ...
+				DownloadDelEvent()
 			},
 		},
 		&widget.Button{
@@ -327,7 +328,7 @@ func DownloadContainerShow() {
 			//Icon: theme.NavigateNextIcon(),
 			OnTapped: func() {
 				logger.Debug("设置密码")
-				// todo ...
+				DownloadPasswordEvent(downloadData.Password)
 			},
 		},
 		&widget.Button{
@@ -335,7 +336,7 @@ func DownloadContainerShow() {
 			//Icon: theme.NavigateNextIcon(),
 			OnTapped: func() {
 				logger.Debug("下载日志")
-				// todo ...
+				DownloadLogEvent()
 			},
 		},
 		layout.NewSpacer())

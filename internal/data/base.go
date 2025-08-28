@@ -123,6 +123,11 @@ func (ldb *LocalDB) Close() {
 	_ = ldb.Conn.Close()
 }
 
+func (ldb *LocalDB) GetDB() *bolt.DB {
+	ldb.Open()
+	return ldb.Conn
+}
+
 func (ldb *LocalDB) ClearTable(table string) error {
 	ldb.Open()
 	defer func() {
@@ -241,4 +246,29 @@ func (ldb *LocalDB) Delete(table, key string) error {
 		}
 		return nil
 	})
+}
+
+func (ldb *LocalDB) AllKey(table string) ([]string, error) {
+	keys := make([]string, 0)
+
+	ldb.Open()
+
+	defer func() {
+		_ = ldb.Conn.Close()
+	}()
+
+	err := ldb.Conn.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(table))
+		if b == nil {
+			return TableNotFound
+		}
+
+		c := b.Cursor()
+		for k, _ := c.First(); k != nil; k, _ = c.Next() {
+			keys = append(keys, string(k))
+		}
+
+		return nil
+	})
+	return keys, err
 }
