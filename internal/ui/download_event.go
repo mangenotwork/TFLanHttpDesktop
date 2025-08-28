@@ -7,7 +7,6 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
-	"fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -44,7 +43,7 @@ func DownloadEvent() {
 		NowDownloadFilePath = reader.URI().Path()
 		DownloadContainerShow()
 	}, MainWindow)
-	fd.SetFilter(storage.NewExtensionFileFilter([]string{".png", ".jpg", ".jpeg"}))
+	fd.Resize(fyne.NewSize(900, 600))
 	fd.Show()
 }
 

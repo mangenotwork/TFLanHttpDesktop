@@ -15,6 +15,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -137,6 +138,133 @@ func DownloadExecute(ctx *gin.Context) {
 
 func DebugUploadPg(ctx *gin.Context) {
 	ctx.Data(http.StatusOK, "text/html; charset=utf-8", []byte(assets.UploadPg))
+}
+
+func UploadPg(ctx *gin.Context) {
+	fileKey := ctx.Param("file")
+	logger.Debug("fileKey = ", fileKey)
+	fileKey = strings.Replace(fileKey, "/", "", -1)
+	logger.Debug("define.DownloadMem = ", define.UploadMem)
+	filePath, ok := define.UploadMem[fileKey]
+	if !ok {
+		logger.Debug("file not found")
+		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("下载链接已失效"))
+		return
+	}
+	logger.Info(filePath)
+
+	uploadData, _ := data.GetUploadData()
+	logger.Debug("uploadData = ", uploadData)
+	if uploadData.Path != filePath {
+		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("下载链接已失效"))
+		return
+	}
+
+	isPassword := 0
+	if uploadData.IsPassword {
+		isPassword = 1
+	}
+
+	tpl, err := template.New("html").Parse(assets.UploadPg)
+	if err != nil {
+		logger.Error(err)
+		ctx.Data(http.StatusInternalServerError, "text/html; charset=utf-8", []byte(err.Error()))
+		return
+	}
+
+	token := utils.IDMd5()
+	logger.Debug(token)
+	define.ReqToken.Store(token, true)
+
+	var renderedHTML strings.Builder
+	values := map[string]interface{}{
+		"Title":      "上传文件",
+		"UploadUrl":  fmt.Sprintf("%s/u/%s", define.DoMain, fileKey),
+		"IsPassword": isPassword,
+		"Token":      token,
+	}
+	if err := tpl.Execute(&renderedHTML, values); err != nil {
+		logger.Error(err)
+		ctx.Data(http.StatusInternalServerError, "text/html; charset=utf-8", []byte(err.Error()))
+		return
+	}
+
+	ctx.Data(http.StatusOK, "text/html; charset=utf-8", []byte(renderedHTML.String()))
+	return
+}
+
+func UploadExecute(ctx *gin.Context) {
+	fileKey := ctx.Param("file")
+	logger.Debug("fileKey = ", fileKey)
+	fileKey = strings.Replace(fileKey, "/", "", -1)
+	logger.Debug("define.DownloadMem = ", define.UploadMem)
+	filePath, ok := define.UploadMem[fileKey]
+	if !ok {
+		logger.Debug("file not found")
+		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("下载链接已失效"))
+		return
+	}
+	logger.Info(filePath)
+
+	uploadData, _ := data.GetUploadData()
+	logger.Debug("uploadData = ", uploadData)
+	if uploadData.Path != filePath {
+		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("下载链接已失效"))
+		return
+	}
+
+	token := ctx.PostForm("token")
+	logger.Debug("token = ", token)
+
+	if _, has := define.ReqToken.Load(token); !has {
+		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("非法请求"))
+		return
+	}
+
+	define.ReqToken.Delete(token)
+
+	password := ctx.PostForm("password")
+	logger.Debug("password = ", password)
+	if uploadData.IsPassword && uploadData.Password != password {
+		ctx.JSON(http.StatusForbidden, "密码错误")
+		return
+	}
+
+	fromData, err := ctx.MultipartForm()
+	if err != nil {
+		logger.Error("获取参数失败 err = ", err)
+	}
+	logger.Info("获取参数 fromData = ", fromData)
+
+	files := fromData.File["files"]
+	logger.Debug(files)
+	if len(files) == 0 {
+		ctx.JSON(http.StatusForbidden, "未上传任何文件")
+		return
+	}
+
+	saveErr := make([]string, 0)
+	_ = os.MkdirAll(uploadData.Path, 0755) // 确保目录存在
+	for i, file := range files {
+		// 构建保存路径
+		dst := fmt.Sprintf("%s/%s", uploadData.Path, file.Filename)
+		// todo... 判断是否已经存在，存在则从命名
+		// 保存文件
+		if err := ctx.SaveUploadedFile(file, dst); err != nil {
+			logger.Error("保存文件失败: ", err)
+			saveErr = append(saveErr, fmt.Sprintf("保存失败:%s", file.Filename))
+		}
+		logger.DebugF("文件 %d 保存成功: %s\n", i+1, dst)
+	}
+
+	if len(saveErr) > 0 {
+		ctx.JSON(http.StatusForbidden, saveErr)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, "保存成功")
+	return
+
 }
 
 func DebugMemoPg(ctx *gin.Context) {

@@ -73,78 +73,11 @@ var RightContainer *container.Split
 var LeftContainer *container.Split
 
 var DownloadContainer = container.New(layout.NewVBoxLayout())
+var UploadContainer = container.New(layout.NewVBoxLayout())
 
 func MainContent() *container.Split {
 	DownloadContainerShow()
-	UploadContainer := container.New(layout.NewVBoxLayout())
-	UploadTitle := canvas.NewText("接收上传文件目录: /home/aaa/", nil)
-	UploadTitle.TextStyle = fyne.TextStyle{
-		Bold: true,
-	}
-	UploadTitle.TextSize = 18
-	UploadTitleContainer := container.NewCenter(UploadTitle)
-	UploadContainer.Add(layout.NewSpacer())
-	UploadContainer.Add(UploadTitleContainer)
-	UploadContainer.Add(layout.NewSpacer())
-	//UploadContainer.Add(widget.NewButtonWithIcon("指定接收上传文件目录", theme.FolderIcon(), func() {
-	//	logger.Debug("选择文件目录")
-	//}))
-	qrImgUpload, _ := utils.GetQRCodeIO(fmt.Sprintf("%s/debug/upload", define.DoMain))
-	readerUpload := bytes.NewReader(qrImgUpload)
-	UploadQr := canvas.NewImageFromReader(readerUpload, "移动设备扫码上传")
-	UploadQr.FillMode = canvas.ImageFillOriginal
-	UploadContainer.Add(UploadQr)
-	UploadQrText := canvas.NewText("移动设备扫码上传", nil)
-	UploadQrText.TextSize = 11
-	UploadQrTextContainer := container.NewCenter(UploadQrText)
-	UploadContainer.Add(UploadQrTextContainer)
-
-	UploadTool := container.NewHBox(layout.NewSpacer(),
-		&widget.Button{
-			Text: "指定接收上传目录",
-			Icon: theme.FolderIcon(),
-			OnTapped: func() {
-				logger.Debug("指定接收上传目录")
-				// todo ...
-			},
-		},
-		&widget.Button{
-			Text: "复制链接",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("复制上传链接")
-				// todo ...
-			},
-		},
-		&widget.Button{
-			Text: "删除",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("删除上传")
-				// todo ...
-			},
-		},
-		&widget.Button{
-			Text: "密码管理",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("密码管理")
-				// todo ...
-			},
-		},
-		&widget.Button{
-			Text: "接收日志",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("接收日志")
-				// todo ...
-			},
-		},
-		layout.NewSpacer())
-	UploadToolContainer := container.NewCenter(UploadTool)
-	UploadContainer.Add(layout.NewSpacer())
-	UploadContainer.Add(UploadToolContainer)
-	UploadContainer.Add(layout.NewSpacer())
+	UploadContainerShow()
 
 	RightContainer = container.NewVSplit(DownloadContainer, UploadContainer)
 	RightContainer.SetOffset(0.5)
@@ -308,7 +241,7 @@ func DownloadContainerShow() {
 			},
 		},
 		&widget.Button{
-			Text: "复制链接",
+			Text: "复制",
 			//Icon: theme.NavigateNextIcon(),
 			OnTapped: func() {
 				logger.Debug("复制下载链接")
@@ -316,7 +249,7 @@ func DownloadContainerShow() {
 			},
 		},
 		&widget.Button{
-			Text: "删除下载",
+			Text: "删除",
 			//Icon: theme.NavigateNextIcon(),
 			OnTapped: func() {
 				logger.Debug("删除下载")
@@ -324,7 +257,7 @@ func DownloadContainerShow() {
 			},
 		},
 		&widget.Button{
-			Text: "设置密码",
+			Text: "密码",
 			//Icon: theme.NavigateNextIcon(),
 			OnTapped: func() {
 				logger.Debug("设置密码")
@@ -332,7 +265,7 @@ func DownloadContainerShow() {
 			},
 		},
 		&widget.Button{
-			Text: "下载日志",
+			Text: "日志",
 			//Icon: theme.NavigateNextIcon(),
 			OnTapped: func() {
 				logger.Debug("下载日志")
@@ -347,8 +280,99 @@ func DownloadContainerShow() {
 	DownloadContainer.Refresh()
 }
 
+func UploadContainerShow() {
+	logger.Debug("渲染上传页面 上传目录: ", NowUploadFilePath)
+	UploadContainer.RemoveAll()
+	UploadTitle := canvas.NewText(fmt.Sprintf("接收目录: %s", NowUploadFilePath), nil)
+	UploadTitle.TextStyle = fyne.TextStyle{
+		Bold: true,
+	}
+	UploadContainer.Add(layout.NewSpacer())
+	UploadTitle.TextSize = 16
+	uploadUrl := ""
+	if NowUploadFilePath != "" {
+
+		nowMd5 := utils.GetMD5Encode(NowUploadFilePath)
+		define.UploadMem[nowMd5] = NowUploadFilePath
+		uploadUrl = fmt.Sprintf("%s/upload/%s", define.DoMain, nowMd5)
+
+		UploadTitleContainer := container.NewCenter(UploadTitle)
+
+		UploadContainer.Add(UploadTitleContainer)
+		UploadContainer.Add(layout.NewSpacer())
+		qrImgUpload, _ := utils.GetQRCodeIO(uploadUrl)
+		readerUpload := bytes.NewReader(qrImgUpload)
+		UploadQr := canvas.NewImageFromReader(readerUpload, "移动设备扫码上传")
+		UploadQr.FillMode = canvas.ImageFillOriginal
+		UploadContainer.Add(UploadQr)
+		UploadQrText := canvas.NewText("移动设备扫码上传", nil)
+		UploadQrText.TextSize = 11
+		UploadQrTextContainer := container.NewCenter(UploadQrText)
+		UploadContainer.Add(UploadQrTextContainer)
+	} else {
+		logger.Debug("当前没有选择目录")
+		UploadContainer.Add(container.NewCenter(widget.NewLabel("选择目录接收上传文件")))
+	}
+
+	UploadTool := container.NewHBox(layout.NewSpacer(),
+		&widget.Button{
+			Text: "指定接收上传目录",
+			Icon: theme.FolderIcon(),
+			OnTapped: func() {
+				logger.Debug("指定接收上传目录")
+				UploadEvent()
+			},
+		},
+		&widget.Button{
+			Text: "复制",
+			//Icon: theme.NavigateNextIcon(),
+			OnTapped: func() {
+				logger.Debug("复制上传链接")
+				UploadCopyUrlEvent(uploadUrl)
+			},
+		},
+		&widget.Button{
+			Text: "删除",
+			//Icon: theme.NavigateNextIcon(),
+			OnTapped: func() {
+				logger.Debug("删除上传")
+				// todo ...
+			},
+		},
+		&widget.Button{
+			Text: "密码",
+			//Icon: theme.NavigateNextIcon(),
+			OnTapped: func() {
+				logger.Debug("密码管理")
+				// todo ...
+			},
+		},
+		//&widget.Button{
+		//	Text: "限制类型",
+		//	//Icon: theme.NavigateNextIcon(),
+		//	OnTapped: func() {
+		//		logger.Debug("密码管理")
+		//		// todo ...
+		//	},
+		//},
+		&widget.Button{
+			Text: "日志",
+			//Icon: theme.NavigateNextIcon(),
+			OnTapped: func() {
+				logger.Debug("接收日志")
+				// todo ...
+			},
+		},
+		layout.NewSpacer())
+	UploadToolContainer := container.NewCenter(UploadTool)
+	UploadContainer.Add(layout.NewSpacer())
+	UploadContainer.Add(UploadToolContainer)
+	UploadContainer.Add(layout.NewSpacer())
+	UploadContainer.Refresh()
+}
+
 var NowDownloadFilePath = ""
-var UploadFilePath = ""
+var NowUploadFilePath = ""
 
 func InitDB() {
 	downloadData, err := data.GetDownloadData()
@@ -364,7 +388,7 @@ func InitDB() {
 		logger.Error(err)
 	}
 	if uploadData != nil {
-		UploadFilePath = uploadData.Path
+		NowUploadFilePath = uploadData.Path
 	}
 }
 

@@ -306,21 +306,28 @@
         elements.uploadBtn.disabled = true;
         elements.uploadBtn.innerHTML = '<span>上传中...</span>';
 
-        setTimeout(() => {
-            elements.uploadBtn.innerHTML = '<span>上传成功</span>';
-            elements.uploadBtn.classList.remove('bg-primary');
-            elements.uploadBtn.classList.add('bg-success');
+        console.log("上传文件")
+        console.log(false)
 
-            files = [];
-            renderFileList();
-            updateFileListVisibility();
+        elements.uploadBtn.innerHTML = '<span>上传成功</span>';
+        elements.uploadBtn.classList.remove('bg-primary');
+        elements.uploadBtn.classList.add('bg-success');
 
-            setTimeout(() => {
-                elements.uploadBtn.innerHTML = originalText;
-                elements.uploadBtn.classList.remove('bg-success');
-                elements.uploadBtn.classList.add('bg-primary');
-            }, 2000);
-        }, 1500);
+        // setTimeout(() => {
+        //     elements.uploadBtn.innerHTML = '<span>上传成功</span>';
+        //     elements.uploadBtn.classList.remove('bg-primary');
+        //     elements.uploadBtn.classList.add('bg-success');
+        //
+        //     files = [];
+        //     renderFileList();
+        //     updateFileListVisibility();
+        //
+        //     setTimeout(() => {
+        //         elements.uploadBtn.innerHTML = originalText;
+        //         elements.uploadBtn.classList.remove('bg-success');
+        //         elements.uploadBtn.classList.add('bg-primary');
+        //     }, 2000);
+        // }, 1500);
     }
 
     // 初始化（只执行一次）

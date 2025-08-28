@@ -14,16 +14,21 @@ var Router *gin.Engine
 
 func Routers() *gin.Engine {
 
-	Router.Use(CorsHandler(), Base())
+	Router.Use(gzip.Gzip(gzip.DefaultCompression), CorsHandler(), Base())
+
+	Router.GET("/health", Health)
+
+	Router.GET("/debug/download", DebugDownloadPg)
+	Router.GET("/debug/upload", DebugUploadPg)
+	Router.GET("/debug/memo", DebugMemoPg)
+
+	Router.GET("/tailwindcss", Tailwindcss)
+
 	Router.GET("/download/*file", DownloadPg)
 	Router.GET("/d/*file", DownloadExecute)
 
-	Page := Router.Group("", gzip.Gzip(gzip.DefaultCompression))
-	Page.GET("/health", Health)
-	Page.GET("/debug/download", DebugDownloadPg)
-	Page.GET("/debug/upload", DebugUploadPg)
-	Page.GET("/debug/memo", DebugMemoPg)
-	Page.GET("/tailwindcss", Tailwindcss)
+	Router.GET("/upload/*file", UploadPg)
+	Router.POST("/u/*file", UploadExecute)
 
 	return Router
 }

@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strconv"
 	"strings"
 	"sync"
 )
@@ -188,4 +189,14 @@ func stringValue(v reflect.Value, indent int, buf *bytes.Buffer) {
 		}
 		_, _ = fmt.Fprintf(buf, format, v.Interface())
 	}
+}
+
+// Int64ToStr int64 -> string
+func Int64ToStr(i int64) string {
+	return strconv.FormatInt(i, 10)
+}
+
+// Get16MD5Encode 返回一个16位md5加密后的字符串
+func Get16MD5Encode(data string) string {
+	return GetMD5Encode(data)[8:24]
 }

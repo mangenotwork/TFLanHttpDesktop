@@ -5,7 +5,7 @@ var UploadPg = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>文件上传 - 修复重复选择问题</title>
+    <title>{{.Title}}</title>
     <!-- 引入 Tailwind CSS -->
     <script src="/tailwindcss"></script>
 
@@ -33,7 +33,8 @@ var UploadPg = `<!DOCTYPE html>
                 <h1 class="text-xl sm:text-2xl font-semibold text-gray-800">文件上传</h1>
             </div>
         </div>
-
+		
+		{{ if eq .IsPassword 1}}
         <!-- 上传密码区域 -->
         <div class="mb-6">
             <p class="text-sm text-gray-600 mb-2 flex items-center">
@@ -48,6 +49,7 @@ var UploadPg = `<!DOCTYPE html>
             >
             <p id="passwordError" class="text-danger text-xs mt-1 hidden">密码错误，请重新输入</p>
         </div>
+		{{ end }}
 
         <!-- 选择文件区域 -->
         <div class="mb-6">
@@ -104,8 +106,10 @@ var UploadPg = `<!DOCTYPE html>
     // DOM元素
     const elements = {
         uploadBtn: document.getElementById('uploadBtn'),
+		{{ if eq .IsPassword 1}}
         passwordInput: document.getElementById('uploadPassword'),
         passwordError: document.getElementById('passwordError'),
+		{{ end }}
         fileInput: document.getElementById('fileInput'),
         fileList: document.getElementById('fileList'),
         selectedFiles: document.getElementById('selectedFiles'),
@@ -133,9 +137,11 @@ var UploadPg = `<!DOCTYPE html>
 
         // 4. 上传按钮事件
         elements.uploadBtn.addEventListener('click', handleUpload);
-
+		
+		{{ if eq .IsPassword 1}}	
         // 5. 密码输入事件
         elements.passwordInput.addEventListener('input', handlePasswordInput);
+		{{ end }}
 
         // 6. 删除按钮事件委托（使用捕获阶段避免冲突）
         elements.selectedFiles.addEventListener('click', handleDeleteClick, true);
@@ -195,12 +201,14 @@ var UploadPg = `<!DOCTYPE html>
             elements.fileInput.click();
         }
     }
-
+	
+	{{ if eq .IsPassword 1}}
     // 处理密码输入
     function handlePasswordInput() {
         elements.passwordError.classList.add('hidden');
         elements.passwordInput.classList.remove('border-danger');
     }
+	{{ end }}
 
     // 处理删除点击
     function handleDeleteClick(e) {
@@ -285,44 +293,67 @@ var UploadPg = `<!DOCTYPE html>
         return (bytes / 1048576).toFixed(1) + ' MB';
     }
 
-
     // 处理上传
     function handleUpload() {
-        const password = elements.passwordInput.value.trim();
-
-        if (!password) {
-            elements.passwordError.textContent = '请输入上传密码';
-            elements.passwordError.classList.remove('hidden');
-            elements.passwordInput.classList.add('border-danger');
-            return;
-        }
-
-        if (password !== correctPassword) {
-            elements.passwordError.textContent = '密码错误，请重新输入';
-            elements.passwordError.classList.remove('hidden');
-            elements.passwordInput.classList.add('border-danger');
-            return;
-        }
-
+		
+		const formData = new FormData();
+		formData.append("token", "{{.Token}}")
+		{{ if eq .IsPassword 1}}
+			const password = elements.passwordInput.value.trim();
+			
+			if (!password) {
+				elements.passwordError.textContent = '请输入上传密码';
+				elements.passwordError.classList.remove('hidden');
+				elements.passwordInput.classList.add('border-danger');
+				return;
+			}
+	
+			if (password !== correctPassword) {
+				elements.passwordError.textContent = '密码错误，请重新输入';
+				elements.passwordError.classList.remove('hidden');
+				elements.passwordInput.classList.add('border-danger');
+				return;
+			}
+			formData.append("password", password);
+		{{ end }}
+		
         const originalText = elements.uploadBtn.innerHTML;
         elements.uploadBtn.disabled = true;
         elements.uploadBtn.innerHTML = '<span>上传中...</span>';
+		
+		console.log("上传文件")
+        console.log(files)
+		files.forEach(file => {
+		  formData.append("files", file);
+		});
 
-        setTimeout(() => {
-            elements.uploadBtn.innerHTML = '<span>上传成功</span>';
-            elements.uploadBtn.classList.remove('bg-primary');
-            elements.uploadBtn.classList.add('bg-success');
-
-            files = [];
-            renderFileList();
-            updateFileListVisibility();
-
-            setTimeout(() => {
-                elements.uploadBtn.innerHTML = originalText;
-                elements.uploadBtn.classList.remove('bg-success');
-                elements.uploadBtn.classList.add('bg-primary');
-            }, 2000);
-        }, 1500);
+		const xhr = new XMLHttpRequest();
+        // 后端接收地址
+        xhr.open("POST", "{{.UploadUrl}}", true);
+		
+		xhr.onload = function() {
+            if (xhr.status === 200) {
+                console.log("上传成功:", xhr.responseText);
+                 elements.uploadBtn.innerHTML = '<span>上传成功</span>';
+				 elements.uploadBtn.classList.remove('bg-primary');
+                 elements.uploadBtn.classList.add('bg-success');
+				alert("上传成功");
+				window.location.reload();
+            } else {
+                console.error("上传失败:", xhr.statusText);
+                elements.uploadBtn.innerHTML = '<span>上传失败</span>';
+				elements.uploadBtn.classList.remove('bg-primary');
+                elements.uploadBtn.classList.add('bg-danger');
+				alert("上传失败"+xhr.statusText);
+				window.location.reload(); 
+            }
+        };
+		 xhr.onerror = function() {
+            console.error("网络错误");
+            alert("网络错误");
+			window.location.reload(); 
+         };
+		xhr.send(formData);
     }
 
     // 初始化（只执行一次）
