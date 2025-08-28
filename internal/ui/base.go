@@ -4,6 +4,7 @@ import (
 	"TFLanHttpDesktop/common/define"
 	"TFLanHttpDesktop/common/logger"
 	"TFLanHttpDesktop/common/utils"
+	"TFLanHttpDesktop/internal/data"
 	"bytes"
 	"fmt"
 	"fyne.io/fyne/v2"
@@ -21,6 +22,10 @@ var MainApp fyne.App
 var MainWindow fyne.Window
 
 func InitUI() {
+
+	// 初始化ui需要的数据
+	InitDB()
+
 	MainApp = app.NewWithID("TFLanHttpDesktop.2025.0826")
 	MainWindow = MainApp.NewWindow("TFLanHttpDesktop")
 	logger.Debug("初始化UI")
@@ -67,77 +72,10 @@ func makeTray(a fyne.App) {
 var RightContainer *container.Split
 var LeftContainer *container.Split
 
+var DownloadContainer = container.New(layout.NewVBoxLayout())
+
 func MainContent() *container.Split {
-	DownloadContainer := container.New(layout.NewVBoxLayout())
-	DownloadTitle := canvas.NewText("下载文件: aaaaaa.txt", nil)
-	DownloadTitle.TextStyle = fyne.TextStyle{
-		Bold: true,
-	}
-	DownloadTitle.TextSize = 19
-	DownloadTitleContainer := container.NewCenter(DownloadTitle)
-	DownloadContainer.Add(layout.NewSpacer())
-	DownloadContainer.Add(DownloadTitleContainer)
-	DownloadContainer.Add(layout.NewSpacer())
-	//DownloadContainer.Add(widget.NewButtonWithIcon("选择文件", theme.FileIcon(), func() {
-	//	logger.Debug("选择文件")
-	//}))
-	qrImg, _ := utils.GetQRCodeIO(fmt.Sprintf("%s/debug/download", define.DoMain))
-	reader := bytes.NewReader(qrImg)
-	DownloadQr := canvas.NewImageFromReader(reader, "移动设备扫码下载")
-	DownloadQr.FillMode = canvas.ImageFillOriginal
-	DownloadContainer.Add(DownloadQr)
-	DownloadQrText := canvas.NewText("移动设备扫码下载", nil)
-	DownloadQrText.TextSize = 11
-	DownloadQrTextContainer := container.NewCenter(DownloadQrText)
-	DownloadContainer.Add(DownloadQrTextContainer)
-
-	DownloadTool := container.NewHBox(layout.NewSpacer(),
-		&widget.Button{
-			Text: "选择文件",
-			Icon: theme.FileIcon(),
-			OnTapped: func() {
-				logger.Debug("选择文件")
-				// todo ...
-			},
-		},
-		&widget.Button{
-			Text: "复制链接",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("复制下载链接")
-				// todo ...
-			},
-		},
-		&widget.Button{
-			Text: "删除",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("删除下载")
-				// todo ...
-			},
-		},
-		&widget.Button{
-			Text: "设置密码",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("设置密码")
-				// todo ...
-			},
-		},
-		&widget.Button{
-			Text: "下载日志",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("下载日志")
-				// todo ...
-			},
-		},
-		layout.NewSpacer())
-	DownloadToolContainer := container.NewCenter(DownloadTool)
-	DownloadContainer.Add(layout.NewSpacer())
-	DownloadContainer.Add(DownloadToolContainer)
-	DownloadContainer.Add(layout.NewSpacer())
-
+	DownloadContainerShow()
 	UploadContainer := container.New(layout.NewVBoxLayout())
 	UploadTitle := canvas.NewText("接收上传文件目录: /home/aaa/", nil)
 	UploadTitle.TextStyle = fyne.TextStyle{
@@ -187,10 +125,10 @@ func MainContent() *container.Split {
 			},
 		},
 		&widget.Button{
-			Text: "设置密码",
+			Text: "密码管理",
 			//Icon: theme.NavigateNextIcon(),
 			OnTapped: func() {
-				logger.Debug("设置密码")
+				logger.Debug("密码管理")
 				// todo ...
 			},
 		},
@@ -330,8 +268,104 @@ func MainContent() *container.Split {
 	return mainContent
 }
 
+func DownloadContainerShow() {
+	logger.Debug("渲染下载页面 下载文件: ", NowDownloadFilePath)
+	DownloadContainer.RemoveAll()
+	DownloadTitle := canvas.NewText(fmt.Sprintf("下载文件: %s", NowDownloadFilePath), nil)
+	DownloadTitle.TextStyle = fyne.TextStyle{
+		Bold: true,
+	}
+	DownloadTitle.TextSize = 19
+	DownloadTitleContainer := container.NewCenter(DownloadTitle)
+	DownloadContainer.Add(layout.NewSpacer())
+	downloadUrl := ""
+	if NowDownloadFilePath != "" {
+		nowMd5 := utils.GetMD5Encode(NowDownloadFilePath)
+		define.DownloadMem[nowMd5] = NowDownloadFilePath
+		downloadUrl = fmt.Sprintf("%s/download/%s", define.DoMain, nowMd5)
+		DownloadContainer.Add(DownloadTitleContainer)
+		qrImg, _ := utils.GetQRCodeIO(downloadUrl)
+		reader := bytes.NewReader(qrImg)
+		DownloadQr := canvas.NewImageFromReader(reader, "移动设备扫码下载")
+		DownloadQr.FillMode = canvas.ImageFillOriginal
+		DownloadContainer.Add(DownloadQr)
+		DownloadQrText := canvas.NewText("移动设备扫码下载", nil)
+		DownloadQrText.TextSize = 11
+		DownloadQrTextContainer := container.NewCenter(DownloadQrText)
+		DownloadContainer.Add(DownloadQrTextContainer)
+	} else {
+		DownloadContainer.Add(container.NewCenter(widget.NewLabel("选择提供下载的文件")))
+	}
+	DownloadContainer.Add(layout.NewSpacer())
+	DownloadTool := container.NewHBox(layout.NewSpacer(),
+		&widget.Button{
+			Text: "选择文件",
+			Icon: theme.FileIcon(),
+			OnTapped: func() {
+				logger.Debug("选择文件")
+				DownloadEvent()
+			},
+		},
+		&widget.Button{
+			Text: "复制链接",
+			//Icon: theme.NavigateNextIcon(),
+			OnTapped: func() {
+				logger.Debug("复制下载链接")
+				DownloadCopyUrl(downloadUrl)
+			},
+		},
+		&widget.Button{
+			Text: "删除",
+			//Icon: theme.NavigateNextIcon(),
+			OnTapped: func() {
+				logger.Debug("删除下载")
+				// todo ...
+			},
+		},
+		&widget.Button{
+			Text: "设置密码",
+			//Icon: theme.NavigateNextIcon(),
+			OnTapped: func() {
+				logger.Debug("设置密码")
+				// todo ...
+			},
+		},
+		&widget.Button{
+			Text: "下载日志",
+			//Icon: theme.NavigateNextIcon(),
+			OnTapped: func() {
+				logger.Debug("下载日志")
+				// todo ...
+			},
+		},
+		layout.NewSpacer())
+	DownloadToolContainer := container.NewCenter(DownloadTool)
+	DownloadContainer.Add(layout.NewSpacer())
+	DownloadContainer.Add(DownloadToolContainer)
+	DownloadContainer.Add(layout.NewSpacer())
+	DownloadContainer.Refresh()
+}
+
 var NowDownloadFilePath = ""
 var UploadFilePath = ""
+
+func InitDB() {
+	downloadData, err := data.GetDownloadData()
+	if err != nil {
+		logger.Error(err)
+	}
+	if downloadData != nil {
+		NowDownloadFilePath = downloadData.Path
+	}
+
+	uploadData, err := data.GetUploadData()
+	if err != nil {
+		logger.Error(err)
+	}
+	if uploadData != nil {
+		UploadFilePath = uploadData.Path
+	}
+}
 
 // 创建搜索框组件
 func NewSearchBox() *fyne.Container {

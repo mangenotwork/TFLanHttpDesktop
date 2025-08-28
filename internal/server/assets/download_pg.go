@@ -6,7 +6,7 @@ var DownloadPg = `
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>文件下载</title>
+    <title>{{.Title}}</title>
     <!-- 引入 Tailwind CSS -->
     <script src="/tailwindcss"></script>
     <script>
@@ -29,7 +29,7 @@ var DownloadPg = `
         <!-- 文件图标与名称 -->
         <div class="flex items-center gap-4 mb-5">
             <div>
-                <h1 class="text-xl sm:text-2xl font-semibold text-gray-800">产品需求文档_v2.1.pdf</h1>
+                <h1 class="text-xl sm:text-2xl font-semibold text-gray-800">{{.FileName}}</h1>
             </div>
         </div>
 
@@ -37,11 +37,11 @@ var DownloadPg = `
         <div class="grid grid-cols-2 gap-4 mb-6 text-sm">
             <div class="flex items-center gap-2 text-gray-600">
                 <i class="fa fa-hdd-o text-gray-400"></i>
-                <span>大小: 2.4 MB</span>
+                <span>大小: {{.FileSize}}</span>
             </div>
             <div class="flex items-center gap-2 text-gray-600">
                 <i class="fa fa-file-text-o text-gray-400"></i>
-                <span>格式: PDF</span>
+                <span>格式: {{.Ext}}</span>
             </div>
         </div>
 
@@ -117,22 +117,8 @@ var DownloadPg = `
         }, 3000);
     }
 
-    // 模拟下载过程
     function startDownload() {
-        const originalText = downloadBtn.innerHTML;
-        downloadBtn.disabled = true;
-        downloadBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i><span>下载中...</span>';
-        downloadBtn.classList.add('opacity-80', 'cursor-wait');
-
-        // 模拟下载延迟
-        setTimeout(() => {
-            downloadBtn.innerHTML = '<i class="fa fa-check"></i><span>下载完成</span>';
-            downloadBtn.classList.remove('bg-primary', 'opacity-80', 'cursor-wait');
-            downloadBtn.classList.add('bg-green-500');
-
-            // 实际应用中这里应该是真实的文件下载链接
-            // window.location.href = 'path/to/file.pdf';
-        }, 1500);
+		window.location.href = '{{.DownloadUrl}}';
     }
 
     // 输入密码时清除错误状态

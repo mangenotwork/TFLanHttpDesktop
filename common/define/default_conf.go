@@ -10,3 +10,5 @@ var (
 	HttpPort int
 	DoMain   = ""
 )
+
+var DownloadMem = make(map[string]string)

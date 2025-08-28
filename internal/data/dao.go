@@ -1,10 +1,23 @@
 package data
 
-// todo... 获取当前下载文件数据
+// GetDownloadData 获取当前下载文件数据
+func GetDownloadData() (*DownloadNow, error) {
+	result := &DownloadNow{}
+	err := DB.Get(DownloadNowTable, DownloadNowTableKey, &result)
+	return result, err
+}
 
-// todo... 获取当前上传文件数据
+// GetUploadData 获取当前上传文件数据
+func GetUploadData() (*UploadNow, error) {
+	result := &UploadNow{}
+	err := DB.Get(UploadNowTable, UploadNowTableKey, &result)
+	return result, err
+}
 
 // todo... 创建当前下载文件数据，不存在创建，存在更新
+func SetDownloadData(value *DownloadNow) error {
+	return DB.Set(DownloadNowTable, DownloadNowTableKey, &value)
+}
 
 // todo... 创建当前上传文件路径，不存在创建，存在更新
 

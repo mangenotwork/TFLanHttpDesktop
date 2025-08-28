@@ -9,6 +9,7 @@ import (
 	"TFLanHttpDesktop/internal/ui"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"io"
 	"net"
 	"os"
 	"path/filepath"
@@ -20,7 +21,7 @@ func init() {
 	initDB()
 	cpuNum := runtime.NumCPU()
 	runtime.GOMAXPROCS(cpuNum)
-	//gin.DefaultWriter = io.Discard
+	gin.DefaultWriter = io.Discard
 	server.Router = gin.Default()
 }
 

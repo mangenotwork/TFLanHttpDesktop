@@ -1,14 +1,21 @@
 package server
 
 import (
+	"TFLanHttpDesktop/common/define"
 	"TFLanHttpDesktop/common/logger"
+	"TFLanHttpDesktop/common/utils"
 	"TFLanHttpDesktop/internal/server/assets"
 	"bytes"
 	"compress/gzip"
 	"encoding/base64"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"html/template"
 	"io"
 	"net/http"
+	"net/url"
+	"path/filepath"
+	"strings"
 )
 
 func Health(ctx *gin.Context) {
@@ -18,6 +25,68 @@ func Health(ctx *gin.Context) {
 
 func DebugDownloadPg(ctx *gin.Context) {
 	ctx.Data(http.StatusOK, "text/html; charset=utf-8", []byte(assets.DownloadPg))
+}
+
+func DownloadPg(ctx *gin.Context) {
+	fileKey := ctx.Param("file")
+	logger.Debug("fileKey = ", fileKey)
+	fileKey = strings.Replace(fileKey, "/", "", -1)
+	logger.Debug("define.DownloadMem = ", define.DownloadMem)
+	filePath, ok := define.DownloadMem[fileKey]
+	if !ok {
+		logger.Debug("file not found")
+		ctx.Data(http.StatusOK, "text/html; charset=utf-8", []byte("下载链接已失效"))
+		return
+	}
+	logger.Info(filePath)
+
+	_, _, fileName, ext := utils.ParsePath(filePath)
+	fileSize, _ := utils.GetFileSize(filePath)
+
+	tpl, err := template.New("html").Parse(assets.DownloadPg)
+	if err != nil {
+		logger.Error(err)
+		ctx.Data(http.StatusInternalServerError, "text/html; charset=utf-8", []byte(err.Error()))
+		return
+	}
+	var renderedHTML strings.Builder
+	data := map[string]interface{}{
+		"Title":       "下载文件",
+		"FileName":    fileName,
+		"Ext":         ext,
+		"FileSize":    fileSize,
+		"DownloadUrl": fmt.Sprintf("%s/d/%s", define.DoMain, fileKey),
+	}
+	if err := tpl.Execute(&renderedHTML, data); err != nil {
+		logger.Error(err)
+		ctx.Data(http.StatusInternalServerError, "text/html; charset=utf-8", []byte(err.Error()))
+		return
+	}
+
+	ctx.Data(http.StatusOK, "text/html; charset=utf-8", []byte(renderedHTML.String()))
+	return
+}
+
+func DownloadExecute(ctx *gin.Context) {
+	fileKey := ctx.Param("file")
+	logger.Debug("fileKey = ", fileKey)
+	fileKey = strings.Replace(fileKey, "/", "", -1)
+	logger.Debug("define.DownloadMem = ", define.DownloadMem)
+	filePath, ok := define.DownloadMem[fileKey]
+	if !ok {
+		logger.Debug("file not found")
+		ctx.Data(http.StatusOK, "text/html; charset=utf-8", []byte("下载链接已失效"))
+		return
+	}
+	logger.Info(filePath)
+
+	fileName := filepath.Base(filePath)
+	encodedFileName := url.QueryEscape(fileName)
+	ctx.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s;", encodedFileName))
+	ctx.Header("Content-Type", "application/octet-stream")
+	ctx.Header("Content-Transfer-Encoding", "binary")
+	ctx.File(filePath)
+	return
 }
 
 func DebugUploadPg(ctx *gin.Context) {

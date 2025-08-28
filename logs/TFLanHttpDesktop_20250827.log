@@ -732,3 +732,15 @@ Check your Browserslist config to be sure that your targets are set up correctly
 2025-08-27 16:59:43.249 [DEBUG] internal/ui/base.go:26 	| 初始化UI
 2025-08-27 16:59:43.749 [DEBUG] internal/ui/base.go:46 	| Lifecycle: Entered Foreground
 2025-08-27 16:59:43.788 [DEBUG] internal/ui/base.go:40 	| Lifecycle: Started
+2025-08-27 17:00:23.936 [INFO]  internal/server/router.go:71 	|  200 |            0s |      10.0.50.91 | GET | /debug/download 
+2025-08-27 17:00:23.972 [INFO]  internal/server/handler.go:32 	| Tailwindcss...
+2025-08-27 17:00:23.991 [INFO]  internal/server/router.go:71 	|  200 |      19.753ms |      10.0.50.91 | GET | /tailwindcss 
+2025-08-27 17:00:31.705 [INFO]  internal/server/router.go:71 	|  200 |            0s |      10.0.50.91 | GET | /debug/upload 
+2025-08-27 17:00:31.717 [INFO]  internal/server/handler.go:32 	| Tailwindcss...
+2025-08-27 17:00:31.729 [INFO]  internal/server/router.go:71 	|  200 |     12.1164ms |      10.0.50.91 | GET | /tailwindcss 
+2025-08-27 17:01:17.210 [DEBUG] internal/ui/base.go:49 	| Lifecycle: Exited Foreground
+2025-08-27 17:36:52.057 [DEBUG] internal/ui/base.go:46 	| Lifecycle: Entered Foreground
+2025-08-27 17:36:54.114 [DEBUG] internal/ui/base.go:49 	| Lifecycle: Exited Foreground
+2025-08-28 09:38:12.665 [DEBUG] internal/ui/base.go:46 	| Lifecycle: Entered Foreground
+2025-08-28 09:38:27.323 [DEBUG] internal/ui/base.go:49 	| Lifecycle: Exited Foreground
+2025-08-28 09:41:55.749 [DEBUG] internal/ui/base.go:43 	| Lifecycle: Stopped
