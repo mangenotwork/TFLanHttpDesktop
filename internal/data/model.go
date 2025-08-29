@@ -40,8 +40,8 @@ type Memo struct {
 	Name       string
 	CreateTime time.Time
 	LastTime   time.Time
-	Authority  int    // 客户端权限 0无权限 1只读 2可读写
-	IsPassword bool   // 是否设置密码
+	Authority  int    // 客户端权限 1无权限 2只读 3可读写
+	IsPassword int    // 是否设置密码 0:没 1:有
 	Password   string // 密码
 }
 

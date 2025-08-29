@@ -122,16 +122,106 @@ func GetUploadLog() ([]*UploadLog, error) {
 	return result, nil
 }
 
+// GetMemoList 获取备忘录列表
+func GetMemoList() ([]*Memo, error) {
+	result := make([]*Memo, 0)
+	err := DB.GetAll(MemoTable, func(k, v []byte) {
+		item := &Memo{}
+		err := json.Unmarshal(v, &item)
+		if err != nil {
+			logger.Error(err)
+		} else {
+			result = append(result, item)
+		}
+	})
+	return result, err
+}
+
+// NewMemo 创建备忘录
+func NewMemo(name string, authority int, password string) (*Memo, error) {
+	id := utils.IDMd5()
+	now := time.Now()
+	isPassword := 0
+	if password != "" {
+		isPassword = 1
+	}
+	memo := &Memo{
+		Id:         id,
+		Name:       name,
+		CreateTime: now,
+		LastTime:   now,
+		Authority:  authority,
+		IsPassword: isPassword,
+		Password:   password,
+	}
+	err := DB.Set(MemoTable, id, memo)
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
+	err = DB.Set(MemoContentTable, id, MemoContent(""))
+	return memo, err
+}
+
+func GetMemoContent(id string) (MemoContent, error) {
+	var content MemoContent = ""
+	err := DB.Get(MemoContentTable, id, &content)
+	return content, err
+}
+
+// SetMemoContent 修改备忘录内容
+func SetMemoContent(id string, content string) (MemoContent, error) {
+	err := DB.Set(MemoContentTable, id, content)
+	return MemoContent(content), err
+}
+
+// GetMemoInfo 查看备忘录信息
+func GetMemoInfo(id string) (*Memo, error) {
+	info := &Memo{}
+	err := DB.Get(MemoContentTable, id, &info)
+	return info, err
+}
+
+// SetMemoInfo 查看备忘录信息
+func SetMemoInfo(id string, name string, authority int, password string) (*Memo, error) {
+	now := time.Now()
+	nowMemo, err := GetMemoInfo(id)
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
+
+	nowMemo.LastTime = now
+
+	if name != "" {
+		nowMemo.Name = name
+	}
+
+	if authority != 0 {
+		nowMemo.Authority = authority
+	}
+
+	nowMemo.Password = password
+	if nowMemo.Password == "" {
+		nowMemo.IsPassword = 0
+	} else {
+		nowMemo.IsPassword = 1
+	}
+	err = DB.Set(MemoTable, id, nowMemo)
+	return nowMemo, err
+}
+
+// DeleteMemo 删除备忘录
+func DeleteMemo(id string) error {
+	err := DB.Delete(MemoTable, id)
+	if err != nil {
+		logger.Error(err)
+		return err
+	}
+	err = DB.Delete(MemoContentTable, id)
+	return err
+}
+
 // todo... 记录操作日志
 
 // todo... 查看操作日志
-
-// todo... 创建备忘录
-
-// todo... 修改备忘录内容
-
-// todo... 查看备忘录信息
-
-// todo... 查看备忘录内容
-
-// todo... 删除备忘录

@@ -8,39 +8,18 @@ import (
 	"bytes"
 	"fmt"
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
-	"strconv"
 )
 
 var MainApp fyne.App
 var MainWindow fyne.Window
 
-func InitUI() {
-
-	// 初始化ui需要的数据
-	InitDB()
-
-	MainApp = app.NewWithID("TFLanHttpDesktop.2025.0826")
-	MainWindow = MainApp.NewWindow("TFLanHttpDesktop")
-	logger.Debug("初始化UI")
-
-	logLifecycle(MainApp)
-	makeTray(MainApp)
-
-	MainWindow.Resize(fyne.NewSize(1600, 900))
-	MainWindow.SetMainMenu(MakeMenu())
-	MainWindow.SetMaster()
-	MainWindow.SetContent(MainContent())
-	MainWindow.ShowAndRun()
-}
-
-func logLifecycle(a fyne.App) {
+func LogLifecycle(a fyne.App) {
 	a.Lifecycle().SetOnStarted(func() {
 		logger.Debug("Lifecycle: Started")
 	})
@@ -55,7 +34,7 @@ func logLifecycle(a fyne.App) {
 	})
 }
 
-func makeTray(a fyne.App) {
+func MakeTray(a fyne.App) {
 	if desk, ok := a.(desktop.App); ok {
 		h := fyne.NewMenuItem("Hello", func() {})
 		h.Icon = theme.HomeIcon()
@@ -76,125 +55,20 @@ var DownloadContainer = container.New(layout.NewVBoxLayout())
 var UploadContainer = container.New(layout.NewVBoxLayout())
 
 func MainContent() *container.Split {
+	MemoShow()
 	DownloadContainerShow()
 	UploadContainerShow()
 
+	// 备忘录布局
+	if MemoEntryContainer == nil {
+		MemoEntryContainer = container.New(layout.NewVBoxLayout())
+	}
+	LeftContainer = container.NewHSplit(ListContainer, MemoEntryContainer)
+	LeftContainer.SetOffset(0.3)
+
+	// 下载上传布局
 	RightContainer = container.NewVSplit(DownloadContainer, UploadContainer)
 	RightContainer.SetOffset(0.5)
-
-	// 备忘录
-
-	data := make([]string, 1000)
-	for i := range data {
-		data[i] = "Test Item " + strconv.Itoa(i)
-	}
-
-	entryLoremIpsum := widget.NewMultiLineEntry()
-	entryLoremIpsum.Wrapping = fyne.TextWrapWord
-
-	entryLoremIpsumBtn := container.NewHBox(layout.NewSpacer(),
-		&widget.Button{
-			Text: "刷新",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("刷新")
-				// todo ...
-			},
-		},
-		&widget.Button{
-			Text: "复制链接",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("复制链接")
-				// todo ...
-			},
-		},
-		&widget.Button{
-			Text: "打开二维码",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("打开二维码")
-				// todo ...
-			},
-		},
-		&widget.Button{
-			Text: "删除",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("删除")
-				// todo ...
-			},
-		},
-		&widget.Button{
-			Text: "另存为txt",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("另存为txt")
-				// todo ...
-			},
-		},
-		layout.NewSpacer())
-
-	hbox := container.NewBorder(nil, entryLoremIpsumBtn, nil, nil, entryLoremIpsum)
-
-	list := widget.NewList(
-		func() int {
-			return len(data)
-		},
-		func() fyne.CanvasObject {
-			return container.NewHBox(widget.NewIcon(theme.DocumentIcon()), widget.NewLabel("Template Object"))
-		},
-		func(id widget.ListItemID, item fyne.CanvasObject) {
-			item.(*fyne.Container).Objects[1].(*widget.Label).SetText(data[id])
-		},
-	)
-	list.OnSelected = func(id widget.ListItemID) {
-		//label.SetText(data[id])
-		entryLoremIpsum.SetText(data[id])
-		//icon.SetResource(theme.DocumentIcon())
-	}
-	list.OnUnselected = func(id widget.ListItemID) {
-		//label.SetText("Select An Item From The List")
-		entryLoremIpsum.SetText(data[id])
-		//icon.SetResource(nil)
-	}
-
-	ListContainerTop := container.NewVBox(
-		layout.NewSpacer(),
-		//container.NewCenter(widget.NewLabel("共享备忘录")),
-	)
-	ListContainerTop.Add(container.NewHBox(
-		&widget.Button{
-			Text: "共享备忘录",
-			Icon: theme.ContentAddIcon(),
-			OnTapped: func() {
-				logger.Debug("新建备忘录")
-				// todo ...
-			},
-		},
-		&widget.Button{
-			Text: "导入本地txt",
-			Icon: theme.FolderOpenIcon(),
-			OnTapped: func() {
-				logger.Debug("导入本地txt")
-				// todo ...
-			},
-		},
-		&widget.Button{
-			//Text: "打开二维码",
-			Icon: theme.ViewRefreshIcon(),
-			OnTapped: func() {
-				logger.Debug("刷新")
-				// todo ...
-			},
-		},
-		layout.NewSpacer(),
-	))
-	ListContainerTop.Add(NewSearchBox())
-	ListContainerTop.Add(layout.NewSpacer())
-	ListContainer := container.NewBorder(ListContainerTop, nil, nil, nil, list)
-	LeftContainer = container.NewHSplit(ListContainer, hbox)
-	LeftContainer.SetOffset(0.3)
 
 	mainContent := container.NewHSplit(LeftContainer, RightContainer)
 	mainContent.SetOffset(0.60) // 左侧占比20%
@@ -402,4 +276,122 @@ func NewSearchBox() *fyne.Container {
 	} // 支持回车搜索
 	entryContainer := container.NewStack(entry)
 	return entryContainer
+}
+
+var MemoEntry = widget.NewMultiLineEntry()
+var MemoEntryContainer *fyne.Container
+var ListContainer *fyne.Container
+
+func MemoShow() {
+	logger.Debug("显示备忘录")
+	// 备忘录
+	memoList, _ := data.GetMemoList()
+	dataList := make(map[int]*data.Memo)
+	for i, v := range memoList {
+		dataList[i] = v
+	}
+
+	MemoList := widget.NewList(
+		func() int {
+			return len(dataList)
+		},
+		func() fyne.CanvasObject {
+			return container.NewHBox(widget.NewIcon(theme.DocumentIcon()), widget.NewLabel("Template Object"))
+		},
+		func(id widget.ListItemID, item fyne.CanvasObject) {
+			item.(*fyne.Container).Objects[1].(*widget.Label).SetText(dataList[id].Name)
+		},
+	)
+	MemoList.OnSelected = func(id widget.ListItemID) {
+		MemoEntry.SetText(dataList[id].Name)
+		MemoEntryContainerShow()
+	}
+	MemoList.OnUnselected = func(id widget.ListItemID) {
+		MemoEntry.SetText(dataList[id].Name)
+		MemoEntryContainerShow()
+	}
+
+	ListContainerTop := container.NewVBox(
+		layout.NewSpacer(),
+	)
+	ListContainerTop.Add(container.NewHBox(
+		&widget.Button{
+			Text: "共享备忘录",
+			Icon: theme.ContentAddIcon(),
+			OnTapped: func() {
+				logger.Debug("新建备忘录")
+				NewMemoEvent()
+			},
+		},
+		&widget.Button{
+			Text: "导入本地txt",
+			Icon: theme.FolderOpenIcon(),
+			OnTapped: func() {
+				logger.Debug("导入本地txt")
+				// todo ...
+			},
+		},
+		&widget.Button{
+			//Text: "打开二维码",
+			Icon: theme.ViewRefreshIcon(),
+			OnTapped: func() {
+				logger.Debug("刷新")
+				// todo ...
+			},
+		},
+		layout.NewSpacer(),
+	))
+	ListContainerTop.Add(NewSearchBox())
+	ListContainerTop.Add(layout.NewSpacer())
+	ListContainer = container.NewBorder(ListContainerTop, nil, nil, nil, MemoList)
+}
+
+func MemoEntryContainerShow() {
+	MemoEntryContainer.RemoveAll()
+	MemoEntry.Wrapping = fyne.TextWrapWord
+	entryLoremIpsumBtn := container.NewHBox(layout.NewSpacer(),
+		&widget.Button{
+			Text: "刷新",
+			//Icon: theme.NavigateNextIcon(),
+			OnTapped: func() {
+				logger.Debug("刷新")
+				// todo ...
+			},
+		},
+		&widget.Button{
+			Text: "复制链接",
+			//Icon: theme.NavigateNextIcon(),
+			OnTapped: func() {
+				logger.Debug("复制链接")
+				// todo ...
+			},
+		},
+		&widget.Button{
+			Text: "打开二维码",
+			//Icon: theme.NavigateNextIcon(),
+			OnTapped: func() {
+				logger.Debug("打开二维码")
+				// todo ...
+			},
+		},
+		&widget.Button{
+			Text: "删除",
+			//Icon: theme.NavigateNextIcon(),
+			OnTapped: func() {
+				logger.Debug("删除")
+				// todo ...
+			},
+		},
+		&widget.Button{
+			Text: "另存为txt",
+			//Icon: theme.NavigateNextIcon(),
+			OnTapped: func() {
+				logger.Debug("另存为txt")
+				// todo ...
+			},
+		},
+		layout.NewSpacer())
+
+	MemoEntryContainer = container.NewBorder(nil, entryLoremIpsumBtn, nil, nil, MemoEntry)
+	MemoEntryContainer.Refresh()
 }

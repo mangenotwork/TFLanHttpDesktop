@@ -8,6 +8,8 @@ import (
 	"TFLanHttpDesktop/internal/server"
 	"TFLanHttpDesktop/internal/ui"
 	"fmt"
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/app"
 	"github.com/gin-gonic/gin"
 	"io"
 	"net"
@@ -46,8 +48,25 @@ func main() {
 	logger.InfoF("http服务启动 %s/health", define.DoMain)
 	server.InitHttpServer(listener)
 
-	// 初始化ui
-	ui.InitUI()
+	// 初始化ui需要的数据
+	ui.InitDB()
+
+	ui.MainApp = app.NewWithID("TFLanHttpDesktop.2025.0826")
+	icon, _ := fyne.LoadResourceFromPath("./icon.png")
+	ui.MainApp.SetIcon(icon)
+
+	ui.MainWindow = ui.MainApp.NewWindow("TFLanHttpDesktop")
+	logger.Debug("初始化UI")
+
+	ui.LogLifecycle(ui.MainApp)
+	ui.MakeTray(ui.MainApp)
+
+	ui.MainWindow.Resize(fyne.NewSize(1600, 900))
+	ui.MainWindow.SetMainMenu(ui.MakeMenu())
+	ui.MainWindow.SetMaster()
+	ui.MainWindow.SetContent(ui.MainContent())
+
+	ui.MainWindow.ShowAndRun()
 }
 
 func initDB() {
