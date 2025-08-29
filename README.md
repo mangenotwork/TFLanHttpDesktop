@@ -11,7 +11,6 @@ Transfer Files from LAN Http Desktop, 用于局域网内指定文件生成二维
 - 设定密码，一次性下载等功能
 
 #### todo
-- 选择上传路径界面与功能
 - 应用端增删改查备忘录
 - web端改查备忘录
 - 导入和另存为本地txt

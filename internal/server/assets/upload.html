@@ -306,12 +306,6 @@
             return;
         }
 
-        if (password !== correctPassword) {
-            elements.passwordError.textContent = '密码错误，请重新输入';
-            elements.passwordError.classList.remove('hidden');
-            elements.passwordInput.classList.add('border-danger');
-            return;
-        }
         formData.append("password", password);
         {{ end }}
 
@@ -336,6 +330,12 @@
                 elements.uploadBtn.classList.remove('bg-primary');
                 elements.uploadBtn.classList.add('bg-success');
                 alert("上传成功");
+                window.location.reload();
+            } else if ((xhr.status === 401)) {
+                elements.uploadBtn.innerHTML = '<span>上传失败</span>';
+                elements.uploadBtn.classList.remove('bg-primary');
+                elements.uploadBtn.classList.add('bg-success');
+                alert("密码错误");
                 window.location.reload();
             } else {
                 console.error("上传失败:", xhr.statusText);

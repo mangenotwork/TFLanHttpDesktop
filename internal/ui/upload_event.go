@@ -5,7 +5,9 @@ import (
 	"TFLanHttpDesktop/internal/data"
 	"fmt"
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/widget"
 )
 
 func UploadEvent() {
@@ -63,4 +65,61 @@ func UploadCopyUrlEvent(url string) {
 	clipboard := MainApp.Clipboard()
 	clipboard.SetContent(url)
 	dialog.ShowInformation("复制成功", "链接已复制到剪贴板!", MainWindow)
+}
+
+func UploadDelEvent() {
+	_ = data.SetUploadData(&data.UploadNow{
+		Path:       "",
+		IsPassword: false,
+		Password:   "",
+	})
+	NowUploadFilePath = ""
+	UploadContainerShow()
+	dialog.ShowInformation("删除成功", "已删除接收上传文件链接!", MainWindow)
+}
+
+func UploadPasswordEvent(value string) {
+	password := widget.NewPasswordEntry()
+	password.SetText(value)
+	items := []*widget.FormItem{
+		widget.NewFormItem("Password", password),
+	}
+	passwordDialog := dialog.NewForm("设置密码", "保存", "取消", items, func(b bool) {
+		logger.Info("Please Authenticate", password.Text)
+		newUploadData := &data.UploadNow{
+			Path:       NowUploadFilePath,
+			IsPassword: false,
+			Password:   "",
+		}
+		if password.Text != "" {
+			newUploadData.IsPassword = true
+			newUploadData.Password = password.Text
+		}
+
+		err := data.SetUploadData(newUploadData)
+		if err != nil {
+			dialog.ShowError(err, MainWindow)
+			return
+		}
+
+		UploadContainerShow()
+
+	}, MainWindow)
+	passwordDialog.Resize(fyne.NewSize(500, 300))
+	passwordDialog.Show()
+}
+
+func UploadLogEvent() {
+	logger.Debug("UploadLogEvent")
+
+	logList, _ := data.GetUploadLog()
+	logger.Debug("logList", logList)
+
+	content := container.NewVBox()
+	for _, v := range logList {
+		content.Add(widget.NewLabel(fmt.Sprintf("%s | %s| %s| %s | %s", v.Time, v.Path, v.Files, v.IP, v.UserAgent)))
+	}
+	downloadDialog := dialog.NewCustom("上传日志", "关闭", container.NewScroll(content), MainWindow)
+	downloadDialog.Resize(fyne.NewSize(500, 600))
+	downloadDialog.Show()
 }

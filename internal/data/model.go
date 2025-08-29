@@ -31,7 +31,7 @@ type UploadLog struct {
 	IP        string // 请求端ip
 	UserAgent string // 请求端的user-agent
 	Path      string // 上传文件的路径
-	Size      string // 上传的文件的信息
+	Files     string // 上传的文件的信息
 }
 
 // Memo 备忘录  key是备忘录id

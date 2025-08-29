@@ -220,10 +220,10 @@ func DownloadContainerShow() {
 		DownloadContainer.Add(DownloadTitleContainer)
 		qrImg, _ := utils.GetQRCodeIO(downloadUrl)
 		reader := bytes.NewReader(qrImg)
-		DownloadQr := canvas.NewImageFromReader(reader, "移动设备扫码下载")
+		DownloadQr := canvas.NewImageFromReader(reader, "移动设备在同一WiFi内扫码下载")
 		DownloadQr.FillMode = canvas.ImageFillOriginal
 		DownloadContainer.Add(DownloadQr)
-		DownloadQrText := canvas.NewText("移动设备扫码下载", nil)
+		DownloadQrText := canvas.NewText("移动设备在同一WiFi内扫码下载", nil)
 		DownloadQrText.TextSize = 11
 		DownloadQrTextContainer := container.NewCenter(DownloadQrText)
 		DownloadContainer.Add(DownloadQrTextContainer)
@@ -282,6 +282,7 @@ func DownloadContainerShow() {
 
 func UploadContainerShow() {
 	logger.Debug("渲染上传页面 上传目录: ", NowUploadFilePath)
+	uploadData, _ := data.GetUploadData()
 	UploadContainer.RemoveAll()
 	UploadTitle := canvas.NewText(fmt.Sprintf("接收目录: %s", NowUploadFilePath), nil)
 	UploadTitle.TextStyle = fyne.TextStyle{
@@ -302,10 +303,10 @@ func UploadContainerShow() {
 		UploadContainer.Add(layout.NewSpacer())
 		qrImgUpload, _ := utils.GetQRCodeIO(uploadUrl)
 		readerUpload := bytes.NewReader(qrImgUpload)
-		UploadQr := canvas.NewImageFromReader(readerUpload, "移动设备扫码上传")
+		UploadQr := canvas.NewImageFromReader(readerUpload, "移动设备在同一WiFi内扫码上传")
 		UploadQr.FillMode = canvas.ImageFillOriginal
 		UploadContainer.Add(UploadQr)
-		UploadQrText := canvas.NewText("移动设备扫码上传", nil)
+		UploadQrText := canvas.NewText("移动设备在同一WiFi内扫码上传", nil)
 		UploadQrText.TextSize = 11
 		UploadQrTextContainer := container.NewCenter(UploadQrText)
 		UploadContainer.Add(UploadQrTextContainer)
@@ -336,7 +337,7 @@ func UploadContainerShow() {
 			//Icon: theme.NavigateNextIcon(),
 			OnTapped: func() {
 				logger.Debug("删除上传")
-				// todo ...
+				UploadDelEvent()
 			},
 		},
 		&widget.Button{
@@ -344,7 +345,7 @@ func UploadContainerShow() {
 			//Icon: theme.NavigateNextIcon(),
 			OnTapped: func() {
 				logger.Debug("密码管理")
-				// todo ...
+				UploadPasswordEvent(uploadData.Password)
 			},
 		},
 		//&widget.Button{
@@ -360,7 +361,7 @@ func UploadContainerShow() {
 			//Icon: theme.NavigateNextIcon(),
 			OnTapped: func() {
 				logger.Debug("接收日志")
-				// todo ...
+				UploadLogEvent()
 			},
 		},
 		layout.NewSpacer())

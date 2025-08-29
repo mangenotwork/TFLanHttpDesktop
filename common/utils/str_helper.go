@@ -2,10 +2,14 @@ package utils
 
 import (
 	"bytes"
+	"compress/gzip"
 	"crypto/md5"
+	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -199,4 +203,106 @@ func Int64ToStr(i int64) string {
 // Get16MD5Encode 返回一个16位md5加密后的字符串
 func Get16MD5Encode(data string) string {
 	return GetMD5Encode(data)[8:24]
+}
+
+// CompressStringToBase64 将字符串压缩并返回 base64 编码的字符串
+func CompressStringToBase64(s string) (string, error) {
+	var buf bytes.Buffer
+
+	// 创建 gzip 压缩 writer
+	gz := gzip.NewWriter(&buf)
+	_, err := gz.Write([]byte(s))
+	if err != nil {
+		return "", err
+	}
+
+	// 必须 Close() 才会刷新并写入 gzip 尾部
+	if err := gz.Close(); err != nil {
+		return "", err
+	}
+
+	// 将压缩后的二进制数据用 base64 编码为字符串
+	encoded := base64.StdEncoding.EncodeToString(buf.Bytes())
+	return encoded, nil
+}
+
+// DecompressBase64ToString 将 base64 编码的压缩字符串解压回原始字符串
+func DecompressBase64ToString(encoded string) ([]byte, error) {
+	// 先 base64 解码
+	compressedData, err := base64.StdEncoding.DecodeString(encoded)
+	if err != nil {
+		return nil, err
+	}
+
+	// 创建 gzip 读取器
+	reader, err := gzip.NewReader(bytes.NewReader(compressedData))
+	if err != nil {
+		return nil, err
+	}
+	defer reader.Close()
+
+	// 读取解压后的数据
+	var buf bytes.Buffer
+	_, err = io.Copy(&buf, reader)
+	if err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+}
+
+// FileExists 判断路径（文件/目录）是否存在，并返回具体错误
+// 参数：
+//
+//	path: 待判断的路径
+//	followLink: 是否跟随符号链接（true=跟随目标，false=仅判断链接本身）
+//
+// 返回值：
+//
+//	exists: true=存在，false=不存在
+//	err: 非nil表示判断过程出错（如权限不足）
+func FileExists(path string, followLink bool) (exists bool, err error) {
+	// 路径预处理：清理冗余字符并适配跨平台
+	cleanPath := filepath.Clean(path)
+	if cleanPath == "" {
+		return false, errors.New("无效的空路径")
+	}
+
+	// 根据是否跟随符号链接选择不同的Stat函数
+	var errStat error
+	if followLink {
+		_, errStat = os.Stat(cleanPath) // 跟随符号链接
+	} else {
+		_, errStat = os.Lstat(cleanPath) // 不跟随符号链接
+	}
+
+	// 错误处理逻辑
+	switch {
+	case errStat == nil:
+		// 无错误 → 路径存在
+		return true, nil
+	case os.IsNotExist(errStat):
+		// 明确不存在 → 返回false（无错误）
+		return false, nil
+	case os.IsPermission(errStat):
+		// 权限不足 → 返回错误
+		return false, errors.Join(
+			errors.New("权限不足，无法访问路径"),
+			errStat,
+			errors.New("路径: "+cleanPath),
+		)
+	default:
+		// 其他系统错误（如路径非法、IO错误等）
+		return false, errors.Join(
+			errors.New("判断路径存在性失败"),
+			errStat,
+			errors.New("路径: "+cleanPath),
+		)
+	}
+}
+
+// FileExistsDefault 简化版：默认跟随符号链接，仅返回存在性（兼容原用法）
+func FileExistsDefault(path string) bool {
+	exists, _ := FileExists(path, true)
+	return exists
 }
