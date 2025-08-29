@@ -172,9 +172,8 @@ func UploadPg(ctx *gin.Context) {
 		return
 	}
 
-	token := utils.IDMd5()
+	token, _ := utils.GenerateSignature(filePath)
 	logger.Debug(token)
-	define.ReqToken.Store(token, true)
 
 	var renderedHTML strings.Builder
 	values := map[string]interface{}{
@@ -216,12 +215,10 @@ func UploadExecute(ctx *gin.Context) {
 	token := ctx.PostForm("token")
 	logger.Debug("token = ", token)
 
-	if _, has := define.ReqToken.Load(token); !has {
-		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("非法请求"))
+	if verify, _ := utils.VerifySignature(filePath, token); !verify {
+		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("token无效"))
 		return
 	}
-
-	define.ReqToken.Delete(token)
 
 	password := ctx.PostForm("password")
 	logger.Debug("password = ", password)
@@ -281,11 +278,11 @@ func Tailwindcss(ctx *gin.Context) {
 	//b64, _ := compressStringToBase64(string(b))
 	//logger.Info(b64)
 
-	b, err := decompressBase64ToString(assets.TailwindcssData)
-	if err != nil {
-		logger.Error("读取文件失败,", err.Error())
-	}
-	ctx.Data(http.StatusOK, "text/javascript", b)
+	//b, err := decompressBase64ToString(assets.TailwindcssData)
+	//if err != nil {
+	//	logger.Error("读取文件失败,", err.Error())
+	//}
+	ctx.Data(http.StatusOK, "text/javascript", []byte(assets.TailwindcssData))
 }
 
 // compressStringToBase64 将字符串压缩并返回 base64 编码的字符串
