@@ -30,6 +30,8 @@ func Routers() *gin.Engine {
 	Router.GET("/upload/*file", UploadPg)
 	Router.POST("/u/*file", UploadExecute)
 
+	Router.GET("/memo/:id", MemoPg)
+
 	return Router
 }
 

@@ -48,6 +48,10 @@ type Memo struct {
 // MemoContent 备忘录具体内容 key是备忘录id
 type MemoContent string
 
+func (memo MemoContent) String() string {
+	return string(memo)
+}
+
 // OperationLog 操作日志  key是时间戳
 type OperationLog struct {
 	Time  int64  // 操作时间 时间戳

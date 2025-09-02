@@ -282,3 +282,41 @@ func DebugMemoPg(ctx *gin.Context) {
 func Tailwindcss(ctx *gin.Context) {
 	ctx.Data(http.StatusOK, "text/javascript", []byte(assets.TailwindcssData))
 }
+
+func MemoPg(ctx *gin.Context) {
+	id := ctx.Param("id")
+	logger.Info("id = ", id)
+
+	memoData, err := data.GetMemoInfo(id)
+	if err != nil {
+		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("获取备忘录信息错误"))
+		return
+	}
+
+	memoContent, err := data.GetMemoContent(id)
+	if err != nil {
+		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("获取备忘录内容错误"))
+		return
+	}
+
+	tpl, err := template.New("html").Parse(assets.MemoPg)
+	if err != nil {
+		logger.Error(err)
+		ctx.Data(http.StatusInternalServerError, "text/html; charset=utf-8", []byte(err.Error()))
+		return
+	}
+
+	var renderedHTML strings.Builder
+	values := map[string]interface{}{
+		"Title":   memoData.Name,
+		"Content": memoContent,
+	}
+	if err := tpl.Execute(&renderedHTML, values); err != nil {
+		logger.Error(err)
+		ctx.Data(http.StatusInternalServerError, "text/html; charset=utf-8", []byte(err.Error()))
+		return
+	}
+
+	ctx.Data(http.StatusOK, "text/html; charset=utf-8", []byte(renderedHTML.String()))
+	return
+}

@@ -10,6 +10,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
@@ -59,9 +60,21 @@ func MainContent() *container.Split {
 	DownloadContainerShow()
 	UploadContainerShow()
 
+	MemoEntry.OnChanged = func(val string) {
+		if val == "" {
+			return
+		}
+		logger.Debug(val)
+		_, err := data.SetMemoContent(NowMemoId, val)
+		if err != nil {
+			logger.Error(err)
+			dialog.ShowError(err, MainWindow)
+		}
+	}
+
 	// 备忘录布局
 	if MemoEntryContainer == nil {
-		MemoEntryContainer = container.New(layout.NewVBoxLayout())
+		MemoEntryContainer = container.NewBorder(nil, nil, nil, nil, nil)
 	}
 	LeftContainer = container.NewHSplit(ListContainer, MemoEntryContainer)
 	LeftContainer.SetOffset(0.3)
@@ -281,9 +294,10 @@ func NewSearchBox() *fyne.Container {
 var MemoEntry = widget.NewMultiLineEntry()
 var MemoEntryContainer *fyne.Container
 var ListContainer *fyne.Container
+var MemoListContainer *fyne.Container
+var NowMemoId string = ""
 
-func MemoShow() {
-	logger.Debug("显示备忘录")
+func MemoListShow() {
 	// 备忘录
 	memoList, _ := data.GetMemoList()
 	dataList := make(map[int]*data.Memo)
@@ -291,6 +305,10 @@ func MemoShow() {
 		dataList[i] = v
 	}
 
+	if MemoListContainer == nil {
+		MemoListContainer = container.NewStack()
+	}
+	MemoListContainer.RemoveAll()
 	MemoList := widget.NewList(
 		func() int {
 			return len(dataList)
@@ -299,18 +317,27 @@ func MemoShow() {
 			return container.NewHBox(widget.NewIcon(theme.DocumentIcon()), widget.NewLabel("Template Object"))
 		},
 		func(id widget.ListItemID, item fyne.CanvasObject) {
+			//logger.Info("id = ", id)
 			item.(*fyne.Container).Objects[1].(*widget.Label).SetText(dataList[id].Name)
 		},
 	)
 	MemoList.OnSelected = func(id widget.ListItemID) {
-		MemoEntry.SetText(dataList[id].Name)
-		MemoEntryContainerShow()
+		logger.Debug("id = ", id)
+		logger.Debug("data = ", dataList[id])
+		//MemoEntry.SetText(dataList[id].Name)
+		MemoEntryContainerShow(dataList[id].Id)
 	}
 	MemoList.OnUnselected = func(id widget.ListItemID) {
-		MemoEntry.SetText(dataList[id].Name)
-		MemoEntryContainerShow()
+		//MemoEntry.SetText(dataList[id].Name)
+		MemoEntryContainerShow(dataList[id].Id)
 	}
+	MemoListContainer.Add(MemoList)
+	MemoListContainer.Refresh()
+}
 
+func MemoShow() {
+	logger.Debug("显示备忘录")
+	MemoListShow()
 	ListContainerTop := container.NewVBox(
 		layout.NewSpacer(),
 	)
@@ -343,19 +370,41 @@ func MemoShow() {
 	))
 	ListContainerTop.Add(NewSearchBox())
 	ListContainerTop.Add(layout.NewSpacer())
-	ListContainer = container.NewBorder(ListContainerTop, nil, nil, nil, MemoList)
+	ListContainer = container.NewBorder(ListContainerTop, nil, nil, nil, MemoListContainer)
 }
 
-func MemoEntryContainerShow() {
+func MemoEntryContainerShow(id string) {
+	logger.Debug("MemoEntryContainerShow... id=", id)
+
+	NowMemoId = id
+
+	content, err := data.GetMemoContent(id)
+	if err != nil {
+		logger.Error(err)
+		dialog.ShowError(err, MainWindow)
+	}
+
 	MemoEntryContainer.RemoveAll()
 	MemoEntry.Wrapping = fyne.TextWrapWord
+	MemoEntry.SetText(content.String())
+	MemoEntry.Refresh()
+
+	memoUrl := fmt.Sprintf("%s/memo/%s", define.DoMain, id)
+
 	entryLoremIpsumBtn := container.NewHBox(layout.NewSpacer(),
 		&widget.Button{
 			Text: "刷新",
 			//Icon: theme.NavigateNextIcon(),
 			OnTapped: func() {
 				logger.Debug("刷新")
-				// todo ...
+				newContent, newContentErr := data.GetMemoContent(NowMemoId)
+				if newContentErr != nil {
+					logger.Error(newContentErr)
+					dialog.ShowError(newContentErr, MainWindow)
+				}
+				MemoEntry.SetText(newContent.String())
+				MemoEntry.Refresh()
+				dialog.ShowInformation("刷新成功", "刷新成功!", MainWindow)
 			},
 		},
 		&widget.Button{
@@ -363,15 +412,22 @@ func MemoEntryContainerShow() {
 			//Icon: theme.NavigateNextIcon(),
 			OnTapped: func() {
 				logger.Debug("复制链接")
-				// todo ...
+				clipboard := MainApp.Clipboard()
+				clipboard.SetContent(memoUrl)
+				dialog.ShowInformation("复制成功", "链接已复制到剪贴板!", MainWindow)
 			},
 		},
 		&widget.Button{
 			Text: "打开二维码",
-			//Icon: theme.NavigateNextIcon(),
 			OnTapped: func() {
 				logger.Debug("打开二维码")
-				// todo ...
+				qrImg, _ := utils.GetQRCodeIO(memoUrl)
+				reader := bytes.NewReader(qrImg)
+				DownloadQr := canvas.NewImageFromReader(reader, "移动设备在同一WiFi内扫码下载")
+				DownloadQr.FillMode = canvas.ImageFillOriginal
+				qrDialog := dialog.NewCustom("扫码访问", "关闭", container.NewCenter(DownloadQr), MainWindow)
+				qrDialog.Resize(fyne.NewSize(500, 600))
+				qrDialog.Show()
 			},
 		},
 		&widget.Button{
@@ -379,7 +435,10 @@ func MemoEntryContainerShow() {
 			//Icon: theme.NavigateNextIcon(),
 			OnTapped: func() {
 				logger.Debug("删除")
-				// todo ...
+				dialog.ShowConfirm("确认删除", "确认删除吗?", func(b bool) {
+					logger.Debug(b)
+					// todo...
+				}, MainWindow)
 			},
 		},
 		&widget.Button{
@@ -390,8 +449,16 @@ func MemoEntryContainerShow() {
 				// todo ...
 			},
 		},
+		&widget.Button{
+			Text: "修改标题",
+			//Icon: theme.NavigateNextIcon(),
+			OnTapped: func() {
+				logger.Debug("修改标题")
+				// todo ...
+			},
+		},
 		layout.NewSpacer())
 
-	MemoEntryContainer = container.NewBorder(nil, entryLoremIpsumBtn, nil, nil, MemoEntry)
+	MemoEntryContainer.Add(container.NewBorder(nil, entryLoremIpsumBtn, nil, nil, MemoEntry))
 	MemoEntryContainer.Refresh()
 }

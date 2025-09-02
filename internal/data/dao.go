@@ -166,11 +166,15 @@ func NewMemo(name string, authority int, password string) (*Memo, error) {
 func GetMemoContent(id string) (MemoContent, error) {
 	var content MemoContent = ""
 	err := DB.Get(MemoContentTable, id, &content)
+
+	logger.Debug("[GetMemoContent] id = ", id, " | content = ", content)
+
 	return content, err
 }
 
 // SetMemoContent 修改备忘录内容
 func SetMemoContent(id string, content string) (MemoContent, error) {
+	logger.Debug("[SetMemoContent] id = ", id, " | content = ", content)
 	err := DB.Set(MemoContentTable, id, content)
 	return MemoContent(content), err
 }
@@ -178,7 +182,7 @@ func SetMemoContent(id string, content string) (MemoContent, error) {
 // GetMemoInfo 查看备忘录信息
 func GetMemoInfo(id string) (*Memo, error) {
 	info := &Memo{}
-	err := DB.Get(MemoContentTable, id, &info)
+	err := DB.Get(MemoTable, id, &info)
 	return info, err
 }
 

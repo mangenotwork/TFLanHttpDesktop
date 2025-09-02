@@ -51,7 +51,7 @@ func NewMemoEvent() {
 			return
 		}
 
-		MemoShow()
+		MemoListShow()
 
 	}, MainWindow)
 

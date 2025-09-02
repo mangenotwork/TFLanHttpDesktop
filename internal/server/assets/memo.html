@@ -27,7 +27,7 @@
     <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-5 sm:p-6">
         <!-- 标题区域 -->
         <div class="flex items-center gap-3 mb-5">
-            <h1 class="text-lg sm:text-xl font-semibold text-gray-800">备忘录标题</h1>
+            <h1 class="text-lg sm:text-xl font-semibold text-gray-800">{{.Title}}</h1>
         </div>
 
 
@@ -36,9 +36,9 @@
                 <textarea
                         id="noteContent"
                         placeholder="输入内容..."
-                        rows="36"
+                        rows="20"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition resize-none"
-                ></textarea>
+                style="height: 64vh">{{.Content}}</textarea>
         </div>
 
         <!-- 操作按钮 -->
@@ -60,31 +60,15 @@
 
 <script>
     // DOM元素
-    const noteTitle = document.getElementById('noteTitle');
     const noteContent = document.getElementById('noteContent');
-
-    // 页面加载时读取本地保存的内容
-    window.addEventListener('load', function() {
-        const savedNote = localStorage.getItem('simpleNote');
-        if (savedNote) {
-            const { title, content } = JSON.parse(savedNote);
-            noteTitle.value = title || '';
-            noteContent.value = content || '';
-        }
-    });
 
     // 自动保存函数（输入变化时触发）
     function autoSaveNote() {
-        const noteData = {
-            title: noteTitle.value.trim(),
-            content: noteContent.value.trim()
-        };
-        // 保存到浏览器本地存储
-        localStorage.setItem('simpleNote', JSON.stringify(noteData));
+        let content = noteContent.value.trim()
+        console.log(content)
     }
 
     // 为标题和内容输入框绑定自动保存事件
-    noteTitle.addEventListener('input', autoSaveNote);
     noteContent.addEventListener('input', autoSaveNote);
 </script>
 </body>
