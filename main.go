@@ -5,6 +5,7 @@ import (
 	"TFLanHttpDesktop/common/logger"
 	"TFLanHttpDesktop/common/utils"
 	"TFLanHttpDesktop/internal/data"
+	"TFLanHttpDesktop/internal/mq"
 	"TFLanHttpDesktop/internal/server"
 	"TFLanHttpDesktop/internal/ui"
 	"fmt"
@@ -25,6 +26,7 @@ func init() {
 	runtime.GOMAXPROCS(cpuNum)
 	gin.DefaultWriter = io.Discard
 	server.Router = gin.Default()
+	mq.RunMq()
 }
 
 func main() {

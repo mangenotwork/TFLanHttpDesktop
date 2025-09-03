@@ -5,6 +5,7 @@ import (
 	"TFLanHttpDesktop/common/logger"
 	"TFLanHttpDesktop/common/utils"
 	"TFLanHttpDesktop/internal/data"
+	"TFLanHttpDesktop/internal/mq"
 	"TFLanHttpDesktop/internal/server/assets"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -119,6 +120,12 @@ func DownloadExecute(ctx *gin.Context) {
 	if err != nil {
 		logger.Error("记录下载日志出现错误 ", err)
 	}
+
+	// 通知ui界面更新
+	mq.Producer(&mq.ChanData{
+		Type: 2,
+		Msg:  fmt.Sprintf("三方设备下载了文件（ip:%s）: %s", ip, filePath),
+	})
 
 	fileName := filepath.Base(filePath)
 	encodedFileName := url.QueryEscape(fileName)
@@ -270,6 +277,12 @@ func UploadExecute(ctx *gin.Context) {
 		Files:     strings.Join(filesName, ","),
 	})
 
+	// 通知ui界面更新
+	mq.Producer(&mq.ChanData{
+		Type: 2,
+		Msg:  fmt.Sprintf("三方设备上传了文件（ip:%s|路径:%s）: %s", ip, filePath, strings.Join(filesName, ",")),
+	})
+
 	ctx.JSON(http.StatusOK, "保存成功")
 	return
 
@@ -375,7 +388,7 @@ func MemoSave(ctx *gin.Context) {
 	logger.Debug("sign = ", sign)
 
 	signOk, _ := utils.VerifySignature(id+memoData.Password, sign)
-	if !signOk {
+	if len(memoData.Password) > 0 && !signOk {
 		ctx.Data(http.StatusUnauthorized, "text/html; charset=utf-8", []byte("签名错误"))
 		return
 	}
@@ -388,7 +401,12 @@ func MemoSave(ctx *gin.Context) {
 		return
 	}
 
-	// todo 通知ui界面更新
+	// 通知ui界面更新
+	ip, _ := ctx.Get(ReqIP)
+	mq.Producer(&mq.ChanData{
+		Type: 3,
+		Msg:  "三方设备修改了备忘录（ip: " + ip.(string) + "）: " + memoData.Name,
+	})
 
 	ctx.JSON(http.StatusOK, "上传成功")
 	return
