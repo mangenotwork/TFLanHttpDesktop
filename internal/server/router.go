@@ -32,6 +32,9 @@ func Routers() *gin.Engine {
 
 	Router.GET("/memo/:id", MemoPg)
 
+	Router.POST("/memo_verify", MemoVerify)
+	Router.POST("/memo_save/:id", MemoSave)
+
 	return Router
 }
 

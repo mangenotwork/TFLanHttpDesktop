@@ -31,25 +31,52 @@
         </div>
 
 
-        <!-- 备忘录内容输入 -->
-        <div class="mb-4">
-                <textarea
-                        id="noteContent"
-                        placeholder="输入内容..."
-                        rows="20"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition resize-none"
-                style="height: 64vh">{{.Content}}</textarea>
-        </div>
+        {{ if eq .IsPassword 1 }}
+            <div class="relative">
+                <form class=" text-center" action="/memo_verify?id={{.Id}}" method="post">
+                    <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="请输入密码"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition"
+                    >
+                    <div class="pt-4 border-t border-gray-100">
+                        <button class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors" type="submit">验证</button>
+                    </div>
+                </form>
+            </div>
+        {{ else }}
 
-        <!-- 操作按钮 -->
-        <div class="flex justify-end gap-3">
-            <button id="clearBtn" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors">
-                <i class="fa fa-trash-o mr-1"></i> 清空
-            </button>
-            <button id="saveBtn" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
-                <i class="fa fa-save mr-1"></i> 保存
-            </button>
-        </div>
+            <!-- 备忘录内容输入 -->
+            <div class="mb-4">
+                    <textarea
+                            id="noteContent"
+                            placeholder="输入内容..."
+                            rows="20"
+                            {{ if eq .Authority 2 }} disabled {{ end }}
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition resize-none"
+                    style="height: 64vh">{{.Content}}</textarea>
+            </div>
+
+
+
+            <!-- 操作按钮 -->
+            <div class="flex justify-end gap-3">
+                <button id="copyBtn" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors" onclick="copyText()">
+                    <i class="fa fa-trash-o mr-1"></i> 复制全文
+                </button>
+                {{ if eq .Authority 3 }}
+                <button id="clearBtn" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors" onclick="clearText()">
+                    <i class="fa fa-trash-o mr-1"></i> 清空
+                </button>
+                <button id="saveBtn" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors" onclick="saveText()">
+                    <i class="fa fa-save mr-1"></i> 保存
+                </button>
+                {{ end }}
+            </div>
+
+        {{ end }}
 
         <!-- 底部提示 -->
         <p class="text-center text-gray-500 text-xs mt-4">
@@ -70,6 +97,93 @@
 
     // 为标题和内容输入框绑定自动保存事件
     noteContent.addEventListener('input', autoSaveNote);
+
+
+    async function clearText() {
+        noteContent.value = ""
+    }
+
+    async function saveText() {
+        const formData = new FormData();
+        let content = noteContent.value.trim()
+        formData.append("content", content)
+        const xhr = new XMLHttpRequest();
+        // 后端接收地址
+        xhr.open("POST", "{{.SaveUrl}}", true);
+
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                console.log("保存成功:", xhr.responseText);
+                alert("保存成功");
+                window.location.reload();
+            } else if ((xhr.status === 401)) {
+                alert("签名验证失败");
+                window.location.reload();
+            } else {
+                console.error("保存失败:", xhr.statusText);
+                alert("保存失败"+xhr.statusText);
+                window.location.reload();
+            }
+        };
+        xhr.onerror = function() {
+            console.error("网络错误");
+            alert("网络错误");
+            window.location.reload();
+        };
+        xhr.send(formData);
+    }
+
+    async function copyText() {
+
+        let text = noteContent.value.trim()
+
+        // 方法1：优先使用现代 Async Clipboard API（推荐）
+        if (navigator.clipboard && window.isSecureContext) {
+            try {
+                await navigator.clipboard.writeText(text);
+                alert("复制成功")
+                return true;
+            } catch (err) {
+                console.warn('Clipboard API failed:', err);
+                // 失败时降级到 document.execCommand
+            }
+        }
+
+        // 方法2：降级到 document.execCommand（旧方法）
+        // 需要创建一个临时 textarea 元素并选中
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';  // 防止滚动
+        textarea.style.top = '0';
+        textarea.style.left = '0';
+        textarea.style.width = '2em';
+        textarea.style.height = '2em';
+        textarea.style.padding = '0';
+        textarea.style.border = 'none';
+        textarea.style.outline = 'none';
+        textarea.style.boxShadow = 'none';
+        textarea.style.background = 'transparent';
+        textarea.style.fontSize = '12px';   // 防止 iOS 缩放
+
+        document.body.appendChild(textarea);
+
+        // 选中内容
+        textarea.select();
+        textarea.setSelectionRange(0, text.length); // 兼容移动端
+
+        try {
+            const success = document.execCommand('copy');
+            document.body.removeChild(textarea);
+            alert("复制成功")
+            return true
+        } catch (err) {
+            console.warn('execCommand failed:', err);
+            document.body.removeChild(textarea);
+            alert("复制失败！请手动复制")
+            return false;
+        }
+    }
+
 </script>
 </body>
 </html>

@@ -293,6 +293,12 @@ func MemoPg(ctx *gin.Context) {
 		return
 	}
 
+	// 没有权限
+	if memoData.Authority == 1 {
+		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("没有权限访问"))
+		return
+	}
+
 	memoContent, err := data.GetMemoContent(id)
 	if err != nil {
 		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("获取备忘录内容错误"))
@@ -305,11 +311,21 @@ func MemoPg(ctx *gin.Context) {
 		ctx.Data(http.StatusInternalServerError, "text/html; charset=utf-8", []byte(err.Error()))
 		return
 	}
+	sign, _ := ctx.Cookie("sign")
+	signOk, _ := utils.VerifySignature(id+memoData.Password, sign)
+	isPassword := 0
+	if len(memoData.Password) > 0 && !signOk {
+		isPassword = 1
+	}
 
 	var renderedHTML strings.Builder
 	values := map[string]interface{}{
-		"Title":   memoData.Name,
-		"Content": memoContent,
+		"Title":      memoData.Name,
+		"Content":    memoContent,
+		"Authority":  memoData.Authority,
+		"IsPassword": isPassword,
+		"Id":         memoData.Id,
+		"SaveUrl":    "/memo_save/" + memoData.Id,
 	}
 	if err := tpl.Execute(&renderedHTML, values); err != nil {
 		logger.Error(err)
@@ -318,5 +334,62 @@ func MemoPg(ctx *gin.Context) {
 	}
 
 	ctx.Data(http.StatusOK, "text/html; charset=utf-8", []byte(renderedHTML.String()))
+	return
+}
+
+func MemoVerify(ctx *gin.Context) {
+	id := ctx.Query("id")
+	password := ctx.PostForm("password")
+	logger.Debug("id = ", id)
+	logger.Debug("password = ", password)
+
+	memoData, err := data.GetMemoInfo(id)
+	if err != nil {
+		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("获取备忘录信息错误"))
+		return
+	}
+
+	if memoData.Password != password {
+		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("密码错误"))
+		return
+	}
+
+	sign, _ := utils.GenerateSignature(id + password)
+	ctx.SetCookie("sign", sign, 3600*24, "/", "", false, true)
+	ctx.Redirect(http.StatusFound, "/memo/"+id)
+
+}
+
+func MemoSave(ctx *gin.Context) {
+	id := ctx.Param("id")
+	logger.Info("id = ", id)
+
+	memoData, err := data.GetMemoInfo(id)
+	if err != nil {
+		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("获取备忘录信息错误"))
+		return
+	}
+
+	sign, _ := ctx.Cookie("sign")
+
+	logger.Debug("sign = ", sign)
+
+	signOk, _ := utils.VerifySignature(id+memoData.Password, sign)
+	if !signOk {
+		ctx.Data(http.StatusUnauthorized, "text/html; charset=utf-8", []byte("签名错误"))
+		return
+	}
+
+	content := ctx.PostForm("content")
+	_, err = data.SetMemoContent(id, content)
+	if err != nil {
+		logger.Error(err)
+		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("保存失败"))
+		return
+	}
+
+	// todo 通知ui界面更新
+
+	ctx.JSON(http.StatusOK, "上传成功")
 	return
 }

@@ -13,8 +13,11 @@ import (
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
+	"log"
+	"os"
 )
 
 var MainApp fyne.App
@@ -61,9 +64,6 @@ func MainContent() *container.Split {
 	UploadContainerShow()
 
 	MemoEntry.OnChanged = func(val string) {
-		if val == "" {
-			return
-		}
 		logger.Debug(val)
 		_, err := data.SetMemoContent(NowMemoId, val)
 		if err != nil {
@@ -347,7 +347,7 @@ func MemoShow() {
 			Icon: theme.ContentAddIcon(),
 			OnTapped: func() {
 				logger.Debug("新建备忘录")
-				NewMemoEvent()
+				NewMemoEvent(false, "")
 			},
 		},
 		&widget.Button{
@@ -355,15 +355,15 @@ func MemoShow() {
 			Icon: theme.FolderOpenIcon(),
 			OnTapped: func() {
 				logger.Debug("导入本地txt")
-				// todo ...
+				ImportTxtEvent()
 			},
 		},
 		&widget.Button{
-			//Text: "打开二维码",
 			Icon: theme.ViewRefreshIcon(),
 			OnTapped: func() {
 				logger.Debug("刷新")
-				// todo ...
+				MemoListShow()
+				dialog.ShowInformation("刷新成功", "刷新成功!", MainWindow)
 			},
 		},
 		layout.NewSpacer(),
@@ -371,6 +371,23 @@ func MemoShow() {
 	ListContainerTop.Add(NewSearchBox())
 	ListContainerTop.Add(layout.NewSpacer())
 	ListContainer = container.NewBorder(ListContainerTop, nil, nil, nil, MemoListContainer)
+}
+
+// 自定义文字工具栏项（实现 ToolbarItem 接口）
+type TextToolbarItem struct {
+	*widget.Button
+}
+
+// ToolbarObject 实现 ToolbarItem 接口
+func (t *TextToolbarItem) ToolbarObject() fyne.CanvasObject {
+	return t.Button
+}
+
+// 快捷创建文字工具栏项
+func NewTextToolbarItem(label string, onTapped func()) *TextToolbarItem {
+	return &TextToolbarItem{
+		Button: widget.NewButton(label, onTapped),
+	}
 }
 
 func MemoEntryContainerShow(id string) {
@@ -437,8 +454,26 @@ func MemoEntryContainerShow(id string) {
 				logger.Debug("删除")
 				dialog.ShowConfirm("确认删除", "确认删除吗?", func(b bool) {
 					logger.Debug(b)
-					// todo...
+					if b {
+						logger.Debug("删除 ", NowMemoId)
+						err = data.DeleteMemo(NowMemoId)
+						if err != nil {
+							dialog.ShowError(err, MainWindow)
+							return
+						}
+						MemoListShow()
+						MemoEntryContainer.RemoveAll()
+						MemoEntryContainer.Refresh()
+					}
 				}, MainWindow)
+			},
+		},
+		&widget.Button{
+			Text: "编辑属性",
+			//Icon: theme.NavigateNextIcon(),
+			OnTapped: func() {
+				logger.Debug("编辑属性")
+				NewMemoEvent(true, NowMemoId)
 			},
 		},
 		&widget.Button{
@@ -446,15 +481,45 @@ func MemoEntryContainerShow(id string) {
 			//Icon: theme.NavigateNextIcon(),
 			OnTapped: func() {
 				logger.Debug("另存为txt")
-				// todo ...
-			},
-		},
-		&widget.Button{
-			Text: "修改标题",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("修改标题")
-				// todo ...
+
+				memoData, err := data.GetMemoInfo(NowMemoId)
+				if err != nil {
+					dialog.ShowError(err, MainWindow)
+					return
+				}
+
+				fd := dialog.NewFileSave(func(writer fyne.URIWriteCloser, err error) {
+					if err != nil {
+						dialog.ShowError(err, MainWindow)
+						return
+					}
+					if writer == nil {
+						log.Println("Cancelled")
+						return
+					}
+
+					logger.Debug(writer.URI().Path())
+
+					file, err := os.Create(writer.URI().Path())
+					if err != nil {
+						fmt.Println("创建文件失败：", err)
+						return
+					}
+					defer file.Close()
+
+					_, err = file.WriteString(MemoEntry.Text)
+					if err != nil {
+						logger.Error("写入文件失败：", err)
+						dialog.ShowError(err, MainWindow)
+						return
+					}
+					logger.Info("另存为成功")
+					dialog.ShowInformation("另存成功", fmt.Sprintf("另存至:\n%s", writer.URI().Path()), MainWindow)
+				}, MainWindow)
+				fd.SetFilter(storage.NewExtensionFileFilter([]string{".txt"}))
+				fd.SetFileName(memoData.Name + ".txt")
+				fd.SetTitleText("另存为txt")
+				fd.Show()
 			},
 		},
 		layout.NewSpacer())

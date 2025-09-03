@@ -4,13 +4,32 @@ import (
 	"TFLanHttpDesktop/common/logger"
 	"TFLanHttpDesktop/common/utils"
 	"TFLanHttpDesktop/internal/data"
+	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/widget"
+	"os"
 	"time"
 )
 
-func NewMemoEvent() {
+var authorityMap = map[int]string{
+	1: "无权限",
+	2: "只读",
+	3: "可读写",
+}
+
+func NewMemoEvent(isEdit bool, memoId string) {
+	var err error
+	oldMemoData := &data.Memo{}
+	if isEdit {
+		oldMemoData, err = data.GetMemoInfo(memoId)
+		if err != nil {
+			dialog.ShowError(err, MainWindow)
+			return
+		}
+	}
+
 	name := widget.NewEntry()
 	password := widget.NewPasswordEntry()
 	authorityValue := 3
@@ -34,7 +53,17 @@ func NewMemoEvent() {
 		{Text: "密码", Widget: password, HintText: "密码，非必填"},
 	}
 
-	passwordDialog := dialog.NewForm("新建备忘录", "创建", "取消", items, func(b bool) {
+	dialogTitle := "新建备忘录"
+	dialogConfirm := "创建"
+	if isEdit {
+		dialogTitle = fmt.Sprintf("编辑 - %s", oldMemoData.Name)
+		dialogConfirm = "保存编辑"
+		name.SetText(oldMemoData.Name)
+		password.SetText(oldMemoData.Password)
+		authority.SetSelected(authorityMap[oldMemoData.Authority])
+	}
+
+	passwordDialog := dialog.NewForm(dialogTitle, dialogConfirm, "取消", items, func(b bool) {
 
 		logger.Debug("name = ", name.Text)
 		logger.Debug("authorityValue = ", authorityValue)
@@ -44,11 +73,22 @@ func NewMemoEvent() {
 			name.Text = time.Now().Format(utils.TimeTemplate)
 		}
 
-		_, err := data.NewMemo(name.Text, authorityValue, password.Text)
-		if err != nil {
-			logger.Error(err)
-			dialog.ShowError(err, MainWindow)
-			return
+		if isEdit {
+			// 编辑
+			_, err := data.SetMemoInfo(memoId, name.Text, authorityValue, password.Text)
+			if err != nil {
+				logger.Error(err)
+				dialog.ShowError(err, MainWindow)
+				return
+			}
+		} else {
+			// 新建
+			_, err := data.NewMemo(name.Text, authorityValue, password.Text)
+			if err != nil {
+				logger.Error(err)
+				dialog.ShowError(err, MainWindow)
+				return
+			}
 		}
 
 		MemoListShow()
@@ -57,4 +97,51 @@ func NewMemoEvent() {
 
 	passwordDialog.Resize(fyne.NewSize(500, 300))
 	passwordDialog.Show()
+}
+
+func ImportTxtEvent() {
+	fd := dialog.NewFileOpen(func(reader fyne.URIReadCloser, err error) {
+		if err != nil {
+			dialog.ShowError(err, MainWindow)
+			return
+		}
+		if reader == nil {
+			logger.Debug("Cancelled")
+			return
+		}
+
+		if reader == nil {
+			logger.Debug("Cancelled")
+			return
+		}
+		defer reader.Close()
+
+		logger.Debug(reader.URI().Path())
+
+		content, err := os.ReadFile(reader.URI().Path())
+		if err != nil {
+			logger.Error(err)
+			dialog.ShowError(err, MainWindow)
+			return
+		}
+
+		memoData, err := data.NewMemo(fmt.Sprintf("%s - %s - 导入", reader.URI().Name(), time.Now().Format(utils.TimeTemplate)), 3, "")
+		if err != nil {
+			logger.Error(err)
+			dialog.ShowError(err, MainWindow)
+			return
+		}
+		_, err = data.SetMemoContent(memoData.Id, string(content))
+		if err != nil {
+			logger.Error(err)
+			dialog.ShowError(err, MainWindow)
+			return
+		}
+		MemoListShow()
+
+		return
+
+	}, MainWindow)
+	fd.SetFilter(storage.NewExtensionFileFilter([]string{".txt"}))
+	fd.Show()
 }
