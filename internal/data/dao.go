@@ -283,18 +283,18 @@ func GetOperationLog() ([]*OperationLog, error) {
 
 func GetMemoCiList(id string) ([]*MemoCiList, error) {
 	result := make([]*MemoCiList, 0)
-	err := DB.Get(MemoCiListTable, id, &result)
+	err := FcDB.Get(MemoCiListTable, id, &result)
 	return result, err
 }
 
 func SetMemoCiList(id string, list []*MemoCiList) error {
-	err := DB.Set(MemoCiListTable, id, &list)
+	err := FcDB.Set(MemoCiListTable, id, &list)
 	return err
 }
 
 func GetCiList(ci string) ([]*CiList, error) {
 	result := make([]*CiList, 0)
-	err := DB.Get(CiListTable, ci, &result)
+	err := CiDB.Get(CiListTable, ci, &result)
 	sort.Slice(result, func(i, j int) bool {
 		if result[i].WordFrequency > result[j].WordFrequency {
 			return true
@@ -305,6 +305,6 @@ func GetCiList(ci string) ([]*CiList, error) {
 }
 
 func SetCiList(ci string, list []*CiList) error {
-	err := DB.Set(CiListTable, ci, &list)
+	err := CiDB.Set(CiListTable, ci, &list)
 	return err
 }

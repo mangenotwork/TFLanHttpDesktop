@@ -73,17 +73,18 @@ func main() {
 
 func initDB() {
 	logger.Debug("初始化DB")
-	dbPath := resolveDBPath()
+	dbPath, fcPath, ciPath := resolveDBPath()
 	dir := filepath.Dir(dbPath)
-	logger.Debug("应用数据文件: ", dir)
+	logger.Debug("应用数据文件: ", dbPath, fcPath, ciPath)
 	if err := os.MkdirAll(dir, 0700); err != nil {
 		logger.Error(err)
 		os.Exit(1)
 	}
-	data.InitDB(dbPath)
+	data.InitDB(dbPath, fcPath, ciPath)
+
 }
 
-func resolveDBPath() string {
+func resolveDBPath() (string, string, string) {
 	switch runtime.GOOS {
 	case "windows":
 		appDataPath := os.Getenv("APPDATA")
@@ -91,13 +92,19 @@ func resolveDBPath() string {
 			userProfile := os.Getenv("USERPROFILE")
 			appDataPath = filepath.Join(userProfile, "AppData", "Roaming")
 		}
-		return filepath.Join(appDataPath, define.DBFileDirName, define.DBFileFileName)
+		return filepath.Join(appDataPath, define.DBFileDirName, define.DBFileFileName),
+			filepath.Join(appDataPath, define.DBFileDirName, define.FcDBFileFileName),
+			filepath.Join(appDataPath, define.DBFileDirName, define.CiDBFileFileName)
 	case "linux":
 		home := os.Getenv("HOME")
-		return filepath.Join(home, ".local", "share", define.DBFileDirName, define.DBFileFileName)
+		return filepath.Join(home, ".local", "share", define.DBFileDirName, define.DBFileFileName),
+			filepath.Join(home, ".local", "share", define.DBFileDirName, define.FcDBFileFileName),
+			filepath.Join(home, ".local", "share", define.DBFileDirName, define.CiDBFileFileName)
 	case "darwin":
 		home := os.Getenv("HOME")
-		return filepath.Join(home, "Library", "Application Support", define.DBFileDirName, define.DBFileFileName)
+		return filepath.Join(home, "Library", "Application Support", define.DBFileDirName, define.DBFileFileName),
+			filepath.Join(home, "Library", "Application Support", define.DBFileDirName, define.FcDBFileFileName),
+			filepath.Join(home, "Library", "Application Support", define.DBFileDirName, define.CiDBFileFileName)
 	default:
 		panic("不支持的操作系统")
 	}

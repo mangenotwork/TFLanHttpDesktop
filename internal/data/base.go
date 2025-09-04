@@ -27,8 +27,13 @@ const (
 )
 
 var DB *LocalDB
+var FcDB *LocalDB
+var CiDB *LocalDB
+
 var Tables = []string{DownloadNowTable, DownloadLogTable, UploadNowTable, UploadLogTable,
-	MemoTable, MemoContentTable, OperationLogTable, MemoCiListTable, CiListTable}
+	MemoTable, MemoContentTable, OperationLogTable}
+var FcTables = []string{MemoCiListTable}
+var CiTables = []string{CiListTable}
 var ISNULL = fmt.Errorf("ISNULL")
 var TableNotFound = fmt.Errorf("table notfound")
 
@@ -115,9 +120,13 @@ func NewLocalDB(tables []string, path string) *LocalDB {
 
 var MemoEntryTime time.Time
 
-func InitDB(dbPath string) {
+func InitDB(dbPath, fcPath, ciPath string) {
 	DB = NewLocalDB(Tables, dbPath)
 	DB.Init()
+	FcDB = NewLocalDB(FcTables, fcPath)
+	FcDB.Init()
+	CiDB = NewLocalDB(CiTables, ciPath)
+	CiDB.Init()
 	// 初始化分词
 	Seg.SkipLog = true
 	err := Seg.LoadDict()

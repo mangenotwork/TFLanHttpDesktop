@@ -1,10 +1,10 @@
 package define
 
 const (
-	DBFileDirName  = "TFLanHttpDesktop"
-	DBFileFileName = "data.db"
-	CsrfAuthKey    = "https://github.com/mangenotwork/TFLanHttpDesktop"
-	CsrfName       = "TFLanHttpDesktop"
+	DBFileDirName    = "TFLanHttpDesktop"
+	DBFileFileName   = "data.db"
+	FcDBFileFileName = "fc.db"
+	CiDBFileFileName = "ci.db"
 )
 
 var (
