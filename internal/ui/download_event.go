@@ -2,12 +2,14 @@ package ui
 
 import (
 	"TFLanHttpDesktop/common/logger"
+	"TFLanHttpDesktop/common/utils"
 	"TFLanHttpDesktop/internal/data"
 	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
+	"time"
 )
 
 func DownloadEvent() {
@@ -40,6 +42,11 @@ func DownloadEvent() {
 			return
 		}
 
+		_ = data.SetOperationLog(&data.OperationLog{
+			Time:  time.Now().Format(utils.TimeTemplate),
+			Event: fmt.Sprintf("选择了对外下载文件:%s", reader.URI().Path()),
+		})
+
 		NowDownloadFilePath = reader.URI().Path()
 		DownloadContainerShow()
 	}, MainWindow)
@@ -62,6 +69,10 @@ func DownloadDelEvent() {
 		Path:       "",
 		IsPassword: false,
 		Password:   "",
+	})
+	_ = data.SetOperationLog(&data.OperationLog{
+		Time:  time.Now().Format(utils.TimeTemplate),
+		Event: "删除了对外下载文件",
 	})
 	NowDownloadFilePath = ""
 	DownloadContainerShow()
@@ -92,7 +103,10 @@ func DownloadPasswordEvent(value string) {
 			dialog.ShowError(err, MainWindow)
 			return
 		}
-
+		_ = data.SetOperationLog(&data.OperationLog{
+			Time:  time.Now().Format(utils.TimeTemplate),
+			Event: fmt.Sprintf("设置了对外下载文件的密码,文件:%s", NowDownloadFilePath),
+		})
 		DownloadContainerShow()
 
 	}, MainWindow)

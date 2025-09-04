@@ -226,6 +226,46 @@ func DeleteMemo(id string) error {
 	return err
 }
 
-// todo... 记录操作日志
+// SetOperationLog 记录操作日志
+func SetOperationLog(value *OperationLog) error {
+	return DB.Set(OperationLogTable, utils.AnyToString(time.Now().Unix()), &value)
+}
 
-// todo... 查看操作日志
+// GetOperationLog 查看操作日志
+func GetOperationLog() ([]*OperationLog, error) {
+	limit := 1000
+	result := make([]*OperationLog, 0)
+	db := DB.GetDB()
+	defer db.Close()
+	err := db.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(OperationLogTable))
+		if bucket == nil {
+			return fmt.Errorf("bucket %s 不存在", OperationLogTable)
+		}
+
+		cursor := bucket.Cursor()
+		count := 0
+
+		// 1. 移动到最后一个key
+		k, v := cursor.Last()
+		for k != nil && count < limit {
+			item := &OperationLog{}
+			err := json.Unmarshal(v, &item)
+			if err != nil {
+				log.Fatal(err)
+			} else {
+				result = append(result, item)
+			}
+			// 3. 向前移动游标
+			k, v = cursor.Prev()
+			count++
+		}
+		return nil
+	})
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
+
+	return result, nil
+}

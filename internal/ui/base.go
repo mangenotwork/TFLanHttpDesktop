@@ -13,11 +13,8 @@ import (
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/layout"
-	"fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
-	"log"
-	"os"
 )
 
 var MainApp fyne.App
@@ -429,22 +426,14 @@ func MemoEntryContainerShow(id string) {
 			//Icon: theme.NavigateNextIcon(),
 			OnTapped: func() {
 				logger.Debug("复制链接")
-				clipboard := MainApp.Clipboard()
-				clipboard.SetContent(memoUrl)
-				dialog.ShowInformation("复制成功", "链接已复制到剪贴板!", MainWindow)
+				CopyMemoEvent(memoUrl)
 			},
 		},
 		&widget.Button{
 			Text: "打开二维码",
 			OnTapped: func() {
 				logger.Debug("打开二维码")
-				qrImg, _ := utils.GetQRCodeIO(memoUrl)
-				reader := bytes.NewReader(qrImg)
-				DownloadQr := canvas.NewImageFromReader(reader, "移动设备在同一WiFi内扫码下载")
-				DownloadQr.FillMode = canvas.ImageFillOriginal
-				qrDialog := dialog.NewCustom("扫码访问", "关闭", container.NewCenter(DownloadQr), MainWindow)
-				qrDialog.Resize(fyne.NewSize(500, 600))
-				qrDialog.Show()
+				OpenMemoEvent(memoUrl)
 			},
 		},
 		&widget.Button{
@@ -452,20 +441,7 @@ func MemoEntryContainerShow(id string) {
 			//Icon: theme.NavigateNextIcon(),
 			OnTapped: func() {
 				logger.Debug("删除")
-				dialog.ShowConfirm("确认删除", "确认删除吗?", func(b bool) {
-					logger.Debug(b)
-					if b {
-						logger.Debug("删除 ", NowMemoId)
-						err = data.DeleteMemo(NowMemoId)
-						if err != nil {
-							dialog.ShowError(err, MainWindow)
-							return
-						}
-						MemoListShow()
-						MemoEntryContainer.RemoveAll()
-						MemoEntryContainer.Refresh()
-					}
-				}, MainWindow)
+				DelMemoEvent()
 			},
 		},
 		&widget.Button{
@@ -481,45 +457,7 @@ func MemoEntryContainerShow(id string) {
 			//Icon: theme.NavigateNextIcon(),
 			OnTapped: func() {
 				logger.Debug("另存为txt")
-
-				memoData, err := data.GetMemoInfo(NowMemoId)
-				if err != nil {
-					dialog.ShowError(err, MainWindow)
-					return
-				}
-
-				fd := dialog.NewFileSave(func(writer fyne.URIWriteCloser, err error) {
-					if err != nil {
-						dialog.ShowError(err, MainWindow)
-						return
-					}
-					if writer == nil {
-						log.Println("Cancelled")
-						return
-					}
-
-					logger.Debug(writer.URI().Path())
-
-					file, err := os.Create(writer.URI().Path())
-					if err != nil {
-						fmt.Println("创建文件失败：", err)
-						return
-					}
-					defer file.Close()
-
-					_, err = file.WriteString(MemoEntry.Text)
-					if err != nil {
-						logger.Error("写入文件失败：", err)
-						dialog.ShowError(err, MainWindow)
-						return
-					}
-					logger.Info("另存为成功")
-					dialog.ShowInformation("另存成功", fmt.Sprintf("另存至:\n%s", writer.URI().Path()), MainWindow)
-				}, MainWindow)
-				fd.SetFilter(storage.NewExtensionFileFilter([]string{".txt"}))
-				fd.SetFileName(memoData.Name + ".txt")
-				fd.SetTitleText("另存为txt")
-				fd.Show()
+				MemoSaveToTxt()
 			},
 		},
 		layout.NewSpacer())

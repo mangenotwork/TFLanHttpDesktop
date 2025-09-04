@@ -2,8 +2,12 @@ package ui
 
 import (
 	"TFLanHttpDesktop/common/logger"
+	"TFLanHttpDesktop/internal/data"
+	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/cmd/fyne_settings/settings"
+	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
@@ -33,6 +37,17 @@ func MakeMenu() *fyne.MainMenu {
 		w.Resize(fyne.NewSize(440, 520))
 		w.Show()
 	}
+	operationLog := func() {
+		logList, _ := data.GetOperationLog()
+		logger.Debug("logList", logList)
+		content := container.NewVBox()
+		for _, v := range logList {
+			content.Add(widget.NewLabel(fmt.Sprintf("%s | %s", v.Time, v.Event)))
+		}
+		downloadDialog := dialog.NewCustom("下载日志", "关闭", container.NewScroll(content), MainWindow)
+		downloadDialog.Resize(fyne.NewSize(500, 600))
+		downloadDialog.Show()
+	}
 	showAbout := func() {
 		w := MainApp.NewWindow("关于")
 		w.SetContent(widget.NewLabel("TFLanHttpDesktop\nTransfer Files from LAN Http Desktop, 用于局域网内指定文件生成二维码或链接提供给三方设备用局域网http协议下载文件，三方设备也可以上传文件，桌面应用程序，跨平台。"))
@@ -40,6 +55,7 @@ func MakeMenu() *fyne.MainMenu {
 	}
 	aboutItem := fyne.NewMenuItem("关于", showAbout)
 	settingsItem := fyne.NewMenuItem("设置", openSettings)
+	operationLogItem := fyne.NewMenuItem("系统日志", operationLog)
 	settingsShortcut := &desktop.CustomShortcut{KeyName: fyne.KeyComma, Modifier: fyne.KeyModifierShortcutDefault}
 	settingsItem.Shortcut = settingsShortcut
 	MainWindow.Canvas().AddShortcut(settingsShortcut, func(shortcut fyne.Shortcut) {
@@ -71,6 +87,7 @@ func MakeMenu() *fyne.MainMenu {
 	if !device.IsMobile() && !device.IsBrowser() {
 		file.Items = append(file.Items, fyne.NewMenuItemSeparator(), settingsItem)
 	}
+	file.Items = append(file.Items, operationLogItem)
 	file.Items = append(file.Items, aboutItem)
 	return fyne.NewMainMenu(
 		file,

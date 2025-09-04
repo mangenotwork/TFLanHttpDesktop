@@ -54,6 +54,6 @@ func (memo MemoContent) String() string {
 
 // OperationLog 操作日志  key是时间戳
 type OperationLog struct {
-	Time  int64  // 操作时间 时间戳
+	Time  string // 操作时间 时间戳
 	Event string // 操作事件
 }

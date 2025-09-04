@@ -2,7 +2,10 @@ package mq
 
 import (
 	"TFLanHttpDesktop/common/logger"
+	"TFLanHttpDesktop/common/utils"
+	"TFLanHttpDesktop/internal/data"
 	"fyne.io/fyne/v2"
+	"time"
 )
 
 type ChanData struct {
@@ -27,6 +30,12 @@ func RunMq() {
 					Title:   "TFLanHttpDesktop",
 					Content: c.Msg,
 				})
+
+				_ = data.SetOperationLog(&data.OperationLog{
+					Time:  time.Now().Format(utils.TimeTemplate),
+					Event: c.Msg,
+				})
+
 			}
 		}
 

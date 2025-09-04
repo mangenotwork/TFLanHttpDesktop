@@ -2,12 +2,14 @@ package ui
 
 import (
 	"TFLanHttpDesktop/common/logger"
+	"TFLanHttpDesktop/common/utils"
 	"TFLanHttpDesktop/internal/data"
 	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
+	"time"
 )
 
 func UploadEvent() {
@@ -43,6 +45,10 @@ func UploadEvent() {
 						dialog.ShowError(err, MainWindow)
 						return
 					}
+					_ = data.SetOperationLog(&data.OperationLog{
+						Time:  time.Now().Format(utils.TimeTemplate),
+						Event: fmt.Sprintf("设置了接收上传路径:%s", list.Path()),
+					})
 					NowUploadFilePath = list.Path()
 					UploadContainerShow()
 
@@ -74,6 +80,10 @@ func UploadDelEvent() {
 		Password:   "",
 	})
 	NowUploadFilePath = ""
+	_ = data.SetOperationLog(&data.OperationLog{
+		Time:  time.Now().Format(utils.TimeTemplate),
+		Event: "删除了接收上传路径",
+	})
 	UploadContainerShow()
 	dialog.ShowInformation("删除成功", "已删除接收上传文件链接!", MainWindow)
 }
@@ -101,7 +111,10 @@ func UploadPasswordEvent(value string) {
 			dialog.ShowError(err, MainWindow)
 			return
 		}
-
+		_ = data.SetOperationLog(&data.OperationLog{
+			Time:  time.Now().Format(utils.TimeTemplate),
+			Event: fmt.Sprintf("设置了接收上传路径密码:%s", NowUploadFilePath),
+		})
 		UploadContainerShow()
 
 	}, MainWindow)
