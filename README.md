@@ -11,7 +11,6 @@ Transfer Files from LAN Http Desktop, 用于局域网内指定文件生成二维
 - 设定密码，一次性下载等功能
 
 #### todo
-- ui搜索匹配弹出框词
 - 多语言支持
 - 菜单与帮助
 - UI界面优化，启动提示，设计ui

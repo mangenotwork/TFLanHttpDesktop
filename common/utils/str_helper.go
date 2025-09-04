@@ -306,3 +306,21 @@ func FileExistsDefault(path string) bool {
 	exists, _ := FileExists(path, true)
 	return exists
 }
+
+func SliceDeduplicate[V comparable](a []V) []V {
+	l := len(a)
+	if l < 2 {
+		return a
+	}
+	seen := make(map[V]struct{})
+	j := 0
+	for i := 0; i < l; i++ {
+		if _, ok := seen[a[i]]; ok {
+			continue
+		}
+		seen[a[i]] = struct{}{}
+		a[j] = a[i]
+		j++
+	}
+	return a[:j]
+}

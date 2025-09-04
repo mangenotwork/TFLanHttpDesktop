@@ -8,6 +8,7 @@ import (
 	"github.com/boltdb/bolt"
 	"log"
 	"sort"
+	"strings"
 	"time"
 )
 
@@ -290,6 +291,21 @@ func GetMemoCiList(id string) ([]*MemoCiList, error) {
 func SetMemoCiList(id string, list []*MemoCiList) error {
 	err := FcDB.Set(MemoCiListTable, id, &list)
 	return err
+}
+
+func MatchCi(ci string) []string {
+	result := make([]string, 0)
+	list, err := CiDB.AllKey(CiListTable)
+	if err != nil {
+		logger.Error(err)
+		return []string{}
+	}
+	for _, v := range list {
+		if strings.Contains(v, ci) {
+			result = append(result, v)
+		}
+	}
+	return result
 }
 
 func GetCiList(ci string) ([]*CiList, error) {
