@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 )
 
 const (
@@ -21,11 +22,13 @@ const (
 	MemoTable           = "MemoTable"         // Memo
 	MemoContentTable    = "MemoContentTable"  // MemoContent
 	OperationLogTable   = "OperationLogTable" // OperationLog
+	MemoCiListTable     = "MemoCiListTable"   // MemoCiList
+	CiListTable         = "CiListTable"       // CiList
 )
 
 var DB *LocalDB
 var Tables = []string{DownloadNowTable, DownloadLogTable, UploadNowTable, UploadLogTable,
-	MemoTable, MemoContentTable, OperationLogTable}
+	MemoTable, MemoContentTable, OperationLogTable, MemoCiListTable, CiListTable}
 var ISNULL = fmt.Errorf("ISNULL")
 var TableNotFound = fmt.Errorf("table notfound")
 
@@ -110,17 +113,38 @@ func NewLocalDB(tables []string, path string) *LocalDB {
 	}
 }
 
+var MemoEntryTime time.Time
+
 func InitDB(dbPath string) {
 	DB = NewLocalDB(Tables, dbPath)
 	DB.Init()
+	// 初始化分词
+	Seg.SkipLog = true
+	err := Seg.LoadDict()
+	if err != nil {
+		log.Panic("初始化分词失败")
+	}
+	MemoEntryTime = time.Now()
 }
 
 func (ldb *LocalDB) Open() {
-	ldb.Conn, _ = bolt.Open(ldb.Path, 0600, nil)
+	var err error
+	maxRetries := 4
+	for i := 0; i < maxRetries; i++ {
+		ldb.Conn, err = bolt.Open(ldb.Path, 0600, &bolt.Options{
+			Timeout: 5 * time.Second, // 设置超时时间，避免永久阻塞
+		})
+		if err == nil {
+			break
+		}
+		time.Sleep(40 * time.Millisecond)
+	}
 }
 
 func (ldb *LocalDB) Close() {
-	_ = ldb.Conn.Close()
+	if ldb.Conn != nil {
+		_ = ldb.Conn.Close()
+	}
 }
 
 func (ldb *LocalDB) GetDB() *bolt.DB {
@@ -145,7 +169,9 @@ func (ldb *LocalDB) Stats(table string) (bolt.BucketStats, error) {
 	ldb.Open()
 
 	defer func() {
-		_ = ldb.Conn.Close()
+		if ldb.Conn != nil {
+			_ = ldb.Conn.Close()
+		}
 	}()
 
 	err := ldb.Conn.Update(func(tx *bolt.Tx) error {
@@ -169,7 +195,9 @@ func (ldb *LocalDB) Get(table, key string, data interface{}) error {
 
 	ldb.Open()
 	defer func() {
-		_ = ldb.Conn.Close()
+		if ldb.Conn != nil {
+			_ = ldb.Conn.Close()
+		}
 	}()
 
 	return ldb.Conn.View(func(tx *bolt.Tx) error {
@@ -203,8 +231,15 @@ func (ldb *LocalDB) Set(table, key string, data interface{}) error {
 	ldb.Open()
 
 	defer func() {
-		_ = ldb.Conn.Close()
+		if ldb.Conn != nil {
+			_ = ldb.Conn.Close()
+		}
 	}()
+
+	if ldb.Conn == nil {
+		logger.Error("未取到本地数据连接")
+		return fmt.Errorf("未取到本地数据连接")
+	}
 
 	return ldb.Conn.Update(func(tx *bolt.Tx) error {
 
@@ -232,8 +267,9 @@ func (ldb *LocalDB) Delete(table, key string) error {
 	ldb.Open()
 
 	defer func() {
-		_ = ldb.Conn.Close()
-
+		if ldb.Conn != nil {
+			_ = ldb.Conn.Close()
+		}
 	}()
 
 	return ldb.Conn.Update(func(tx *bolt.Tx) error {
@@ -254,7 +290,9 @@ func (ldb *LocalDB) AllKey(table string) ([]string, error) {
 	ldb.Open()
 
 	defer func() {
-		_ = ldb.Conn.Close()
+		if ldb.Conn != nil {
+			_ = ldb.Conn.Close()
+		}
 	}()
 
 	err := ldb.Conn.View(func(tx *bolt.Tx) error {
@@ -277,7 +315,9 @@ func (ldb *LocalDB) GetAll(table string, f func(k, v []byte)) error {
 	ldb.Open()
 
 	defer func() {
-		_ = ldb.Conn.Close()
+		if ldb.Conn != nil {
+			_ = ldb.Conn.Close()
+		}
 	}()
 
 	err := ldb.Conn.Update(func(tx *bolt.Tx) error {

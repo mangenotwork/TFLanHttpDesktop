@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/boltdb/bolt"
 	"log"
+	"sort"
 	"time"
 )
 
@@ -176,6 +177,16 @@ func GetMemoContent(id string) (MemoContent, error) {
 func SetMemoContent(id string, content string) (MemoContent, error) {
 	logger.Debug("[SetMemoContent] id = ", id, " | content = ", content)
 	err := DB.Set(MemoContentTable, id, content)
+
+	now := time.Now()
+	t := now.Sub(MemoEntryTime).Seconds()
+	if t > 0.02 {
+		go func() {
+			_ = GetMemoFenCiList(id, content)
+		}()
+	}
+	logger.Debug("写入时差 : ", t)
+	MemoEntryTime = now
 	return MemoContent(content), err
 }
 
@@ -268,4 +279,32 @@ func GetOperationLog() ([]*OperationLog, error) {
 	}
 
 	return result, nil
+}
+
+func GetMemoCiList(id string) ([]*MemoCiList, error) {
+	result := make([]*MemoCiList, 0)
+	err := DB.Get(MemoCiListTable, id, &result)
+	return result, err
+}
+
+func SetMemoCiList(id string, list []*MemoCiList) error {
+	err := DB.Set(MemoCiListTable, id, &list)
+	return err
+}
+
+func GetCiList(ci string) ([]*CiList, error) {
+	result := make([]*CiList, 0)
+	err := DB.Get(CiListTable, ci, &result)
+	sort.Slice(result, func(i, j int) bool {
+		if result[i].WordFrequency > result[j].WordFrequency {
+			return true
+		}
+		return false
+	})
+	return result, err
+}
+
+func SetCiList(ci string, list []*CiList) error {
+	err := DB.Set(CiListTable, ci, &list)
+	return err
 }

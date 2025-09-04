@@ -57,3 +57,15 @@ type OperationLog struct {
 	Time  string // 操作时间 时间戳
 	Event string // 操作事件
 }
+
+// MemoCiList 备忘录分词   key是memoId
+type MemoCiList struct {
+	Ci            string
+	WordFrequency int // 词频
+}
+
+// CiList 倒排索引 key是词
+type CiList struct {
+	MemoId        string
+	WordFrequency int // 词频,用于排序
+}

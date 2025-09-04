@@ -6,6 +6,7 @@ import (
 	"TFLanHttpDesktop/common/utils"
 	"TFLanHttpDesktop/internal/data"
 	"bytes"
+	"errors"
 	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
@@ -280,9 +281,63 @@ func InitDB() {
 // 创建搜索框组件
 func NewSearchBox() *fyne.Container {
 	entry := widget.NewEntry()
-	entry.SetPlaceHolder("请输入搜索内容...")
+	entry.SetPlaceHolder("输入关键词搜索内容")
 	entry.OnChanged = func(s string) {
 		logger.Debug("搜索 ", s)
+
+		if s == "" {
+			MemoListShow()
+			return
+		}
+
+		result := make([]*data.CiList, 0)
+
+		fc := data.TermExtract(s)
+		for _, v := range fc {
+			list, err := data.GetCiList(v.Text)
+			if err != nil && !errors.Is(data.ISNULL, err) {
+				logger.Error("err", err)
+				continue
+			}
+			result = append(result, list...)
+		}
+
+		dataList := make(map[int]*data.Memo)
+		for i, v := range result {
+			logger.Debug("搜索结果： ", v)
+			memoData, _ := data.GetMemoInfo(v.MemoId)
+			dataList[i] = memoData
+		}
+
+		if MemoListContainer == nil {
+			MemoListContainer = container.NewStack()
+		}
+		MemoListContainer.RemoveAll()
+		MemoList := widget.NewList(
+			func() int {
+				return len(dataList)
+			},
+			func() fyne.CanvasObject {
+				return container.NewHBox(widget.NewIcon(theme.DocumentIcon()), widget.NewLabel("Template Object"))
+			},
+			func(id widget.ListItemID, item fyne.CanvasObject) {
+				//logger.Info("id = ", id)
+				item.(*fyne.Container).Objects[1].(*widget.Label).SetText(dataList[id].Name)
+			},
+		)
+		MemoList.OnSelected = func(id widget.ListItemID) {
+			logger.Debug("id = ", id)
+			logger.Debug("data = ", dataList[id])
+			//MemoEntry.SetText(dataList[id].Name)
+			MemoEntryContainerShow(dataList[id].Id)
+		}
+		MemoList.OnUnselected = func(id widget.ListItemID) {
+			//MemoEntry.SetText(dataList[id].Name)
+			MemoEntryContainerShow(dataList[id].Id)
+		}
+		MemoListContainer.Add(MemoList)
+		MemoListContainer.Refresh()
+
 	} // 支持回车搜索
 	entryContainer := container.NewStack(entry)
 	return entryContainer
