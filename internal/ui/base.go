@@ -115,6 +115,17 @@ func DownloadContainerShow() {
 		DownloadContainer.Add(container.NewCenter(widget.NewLabel("选择提供下载的文件")))
 	}
 	DownloadContainer.Add(layout.NewSpacer())
+
+	downloadCopy := &widget.Button{
+		Text: T("copy"),
+		//Icon: theme.NavigateNextIcon(),
+		OnTapped: func() {
+			logger.Debug("复制下载链接")
+			DownloadCopyUrlEvent(downloadUrl)
+		},
+	}
+	RegisterTranslatable("copy", downloadCopy)
+
 	DownloadTool := container.NewHBox(layout.NewSpacer(),
 		&widget.Button{
 			Text: "选择文件",
@@ -124,14 +135,15 @@ func DownloadContainerShow() {
 				DownloadEvent()
 			},
 		},
-		&widget.Button{
-			Text: "复制",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("复制下载链接")
-				DownloadCopyUrlEvent(downloadUrl)
-			},
-		},
+		//&widget.Button{
+		//	Text: "复制",
+		//	//Icon: theme.NavigateNextIcon(),
+		//	OnTapped: func() {
+		//		logger.Debug("复制下载链接")
+		//		DownloadCopyUrlEvent(downloadUrl)
+		//	},
+		//},
+		downloadCopy,
 		&widget.Button{
 			Text: "删除",
 			//Icon: theme.NavigateNextIcon(),
@@ -199,6 +211,16 @@ func UploadContainerShow() {
 		UploadContainer.Add(container.NewCenter(widget.NewLabel("选择目录接收上传文件")))
 	}
 
+	uploadCopy := &widget.Button{
+		Text: T("copy"),
+		//Icon: theme.NavigateNextIcon(),
+		OnTapped: func() {
+			logger.Debug("复制上传链接")
+			UploadCopyUrlEvent(uploadUrl)
+		},
+	}
+	RegisterTranslatable("copy", uploadCopy)
+
 	UploadTool := container.NewHBox(layout.NewSpacer(),
 		&widget.Button{
 			Text: "指定接收上传目录",
@@ -208,14 +230,15 @@ func UploadContainerShow() {
 				UploadEvent()
 			},
 		},
-		&widget.Button{
-			Text: "复制",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("复制上传链接")
-				UploadCopyUrlEvent(uploadUrl)
-			},
-		},
+		//&widget.Button{
+		//	Text: "复制",
+		//	//Icon: theme.NavigateNextIcon(),
+		//	OnTapped: func() {
+		//		logger.Debug("复制上传链接")
+		//		UploadCopyUrlEvent(uploadUrl)
+		//	},
+		//},
+		uploadCopy,
 		&widget.Button{
 			Text: "删除",
 			//Icon: theme.NavigateNextIcon(),

@@ -53,8 +53,16 @@ func MakeMenu() *fyne.MainMenu {
 		w.SetContent(widget.NewLabel("TFLanHttpDesktop\nTransfer Files from LAN Http Desktop, 用于局域网内指定文件生成二维码或链接提供给三方设备用局域网http协议下载文件，三方设备也可以上传文件，桌面应用程序，跨平台。"))
 		w.Show()
 	}
+
+	lang := func() {
+		ComponentDialogContainer = NewComponentDialogContainer()
+		ComponentDialogContainer.Resize(fyne.NewSize(500, 600))
+		ComponentDialogContainer.Show()
+	}
+
 	aboutItem := fyne.NewMenuItem("关于", showAbout)
 	settingsItem := fyne.NewMenuItem("设置", openSettings)
+	langItem := fyne.NewMenuItem("语言", lang)
 	operationLogItem := fyne.NewMenuItem("系统日志", operationLog)
 	settingsShortcut := &desktop.CustomShortcut{KeyName: fyne.KeyComma, Modifier: fyne.KeyModifierShortcutDefault}
 	settingsItem.Shortcut = settingsShortcut
@@ -88,6 +96,7 @@ func MakeMenu() *fyne.MainMenu {
 		file.Items = append(file.Items, fyne.NewMenuItemSeparator(), settingsItem)
 	}
 	file.Items = append(file.Items, operationLogItem)
+	file.Items = append(file.Items, langItem)
 	file.Items = append(file.Items, aboutItem)
 	return fyne.NewMainMenu(
 		file,

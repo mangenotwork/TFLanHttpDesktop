@@ -57,11 +57,12 @@ func main() {
 	icon, _ := fyne.LoadResourceFromPath("./icon.png")
 	ui.MainApp.SetIcon(icon)
 
-	ui.MainWindow = ui.MainApp.NewWindow("TFLanHttpDesktop")
+	ui.MainWindow = ui.MainApp.NewWindow(ui.T("appTitle"))
 	logger.Debug("初始化UI")
 
 	ui.LogLifecycle(ui.MainApp)
 	ui.MakeTray(ui.MainApp)
+	ui.InitBus()
 
 	ui.MainWindow.Resize(fyne.NewSize(1600, 900))
 	ui.MainWindow.SetMainMenu(ui.MakeMenu())
