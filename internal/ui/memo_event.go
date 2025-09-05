@@ -18,9 +18,9 @@ import (
 )
 
 var authorityMap = map[int]string{
-	1: "无权限",
-	2: "只读",
-	3: "可读写",
+	1: MLGet(MLTNoPermission),
+	2: MLGet(MLTReadOnly),
+	3: MLGet(MLTReadWrite),
 }
 
 func NewMemoEvent(isEdit bool, memoId string) {
@@ -37,37 +37,37 @@ func NewMemoEvent(isEdit bool, memoId string) {
 	name := widget.NewEntry()
 	password := widget.NewPasswordEntry()
 	authorityValue := 3
-	authority := widget.NewRadioGroup([]string{"无权限", "只读", "可读写"}, func(value string) {
+	authority := widget.NewRadioGroup([]string{MLGet(MLTNoPermission), MLGet(MLTReadOnly), MLGet(MLTReadWrite)}, func(value string) {
 		logger.Debug(value)
 		switch value {
-		case "无权限":
+		case MLGet(MLTNoPermission):
 			authorityValue = 1
-		case "只读":
+		case MLGet(MLTReadOnly):
 			authorityValue = 2
-		case "可读写":
+		case MLGet(MLTReadWrite):
 			authorityValue = 3
 		}
 	})
 	authority.Horizontal = true
-	authority.SetSelected("可读写")
+	authority.SetSelected(MLGet(MLTReadWrite))
 	authority.Required = true
 	items := []*widget.FormItem{
-		{Text: "标题", Widget: name, HintText: "标题，非必填"},
-		{Text: "权限", Widget: authority, HintText: "该权限只针对三方设备"},
-		{Text: "密码", Widget: password, HintText: "密码，非必填"},
+		{Text: MLGet(MLTInputTitle), Widget: name, HintText: MLGet(MLTInputTitleHint)},
+		{Text: MLGet(MLTInputAuthority), Widget: authority, HintText: MLGet(MLTInputAuthorityHint)},
+		{Text: MLGet(MLTInputPassword), Widget: password, HintText: MLGet(MLTInputPasswordHint)},
 	}
 
-	dialogTitle := "新建备忘录"
-	dialogConfirm := "创建"
+	dialogTitle := MLGet(MLTNewMemo)
+	dialogConfirm := MLGet(MLTCreate)
 	if isEdit {
-		dialogTitle = fmt.Sprintf("编辑 - %s", oldMemoData.Name)
-		dialogConfirm = "保存编辑"
+		dialogTitle = MLGet(MLTEditsMemo, oldMemoData.Name)
+		dialogConfirm = MLGet(MLTSaveEdits)
 		name.SetText(oldMemoData.Name)
 		password.SetText(oldMemoData.Password)
 		authority.SetSelected(authorityMap[oldMemoData.Authority])
 	}
 
-	passwordDialog := dialog.NewForm(dialogTitle, dialogConfirm, "取消", items, func(b bool) {
+	passwordDialog := dialog.NewForm(dialogTitle, dialogConfirm, MLGet(MLTCancel), items, func(b bool) {
 
 		logger.Debug("name = ", name.Text)
 		logger.Debug("authorityValue = ", authorityValue)
@@ -126,7 +126,9 @@ func ImportTxtEvent() {
 			logger.Debug("Cancelled")
 			return
 		}
-		defer reader.Close()
+		defer func() {
+			_ = reader.Close()
+		}()
 
 		logger.Debug(reader.URI().Path())
 
@@ -166,24 +168,22 @@ func ImportTxtEvent() {
 func CopyMemoEvent(memoUrl string) {
 	clipboard := MainApp.Clipboard()
 	clipboard.SetContent(memoUrl)
-	dialog.ShowInformation("复制成功", "链接已复制到剪贴板!", MainWindow)
+	dialog.ShowInformation(MLGet(MLTDialogTipTitle), MLGet(MLTDialogCopyLinkSuccess), MainWindow)
 }
 
 func OpenMemoEvent(memoUrl string) {
 	qrImg, _ := utils.GetQRCodeIO(memoUrl)
 	reader := bytes.NewReader(qrImg)
-	DownloadQr := canvas.NewImageFromReader(reader, "移动设备在同一WiFi内扫码下载")
+	DownloadQr := canvas.NewImageFromReader(reader, "")
 	DownloadQr.FillMode = canvas.ImageFillOriginal
-	qrDialog := dialog.NewCustom("扫码访问", "关闭", container.NewCenter(DownloadQr), MainWindow)
+	qrDialog := dialog.NewCustom(MLGet(MLTScanQr), MLGet(MLTClose), container.NewCenter(DownloadQr), MainWindow)
 	qrDialog.Resize(fyne.NewSize(500, 600))
 	qrDialog.Show()
 }
 
 func DelMemoEvent() {
-	dialog.ShowConfirm("确认删除", "确认删除吗?", func(b bool) {
-		logger.Debug(b)
+	dialog.ShowConfirm(MLGet(MLTDialogTipTitle), MLGet(MLTConfirmDeletion), func(b bool) {
 		if b {
-			logger.Debug("删除 ", NowMemoId)
 			err := data.DeleteMemo(NowMemoId)
 			if err != nil {
 				dialog.ShowError(err, MainWindow)
@@ -228,7 +228,9 @@ func MemoSaveToTxt() {
 			fmt.Println("创建文件失败：", err)
 			return
 		}
-		defer file.Close()
+		defer func() {
+			_ = file.Close()
+		}()
 
 		_, err = file.WriteString(MemoEntry.Text)
 		if err != nil {
@@ -236,7 +238,7 @@ func MemoSaveToTxt() {
 			dialog.ShowError(err, MainWindow)
 			return
 		}
-		logger.Info("另存为成功")
+
 		oldMemoData := &data.Memo{}
 		oldMemoData, err = data.GetMemoInfo(NowMemoId)
 		if err != nil {
@@ -247,7 +249,7 @@ func MemoSaveToTxt() {
 			Time:  time.Now().Format(utils.TimeTemplate),
 			Event: fmt.Sprintf("另存了备忘录:%s -> %s ", oldMemoData.Name, writer.URI().Path()),
 		})
-		dialog.ShowInformation("另存成功", fmt.Sprintf("另存至:\n%s", writer.URI().Path()), MainWindow)
+		dialog.ShowInformation(MLGet(MLTDialogTipTitle), MLGet(MLTSaveMemoSuccess, writer.URI().Path()), MainWindow)
 	}, MainWindow)
 	fd.SetFilter(storage.NewExtensionFileFilter([]string{".txt"}))
 	fd.SetFileName(memoData.Name + ".txt")

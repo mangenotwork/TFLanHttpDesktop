@@ -27,9 +27,9 @@ func DownloadEvent() {
 			logger.Debug("Cancelled")
 			return
 		}
-		defer reader.Close()
-
-		logger.Debug("选择的文件： ", reader.URI().Path())
+		defer func() {
+			_ = reader.Close()
+		}()
 
 		err = data.SetDownloadData(&data.DownloadNow{
 			Path:       reader.URI().Path(),
@@ -56,37 +56,40 @@ func DownloadEvent() {
 
 func DownloadCopyUrlEvent(url string) {
 	if url == "" {
-		dialog.ShowError(fmt.Errorf("复制失败，链接为空"), MainWindow)
+		DialogCopyErr()
 		return
 	}
 	clipboard := MainApp.Clipboard()
 	clipboard.SetContent(url)
-	dialog.ShowInformation("复制成功", "链接已复制到剪贴板!", MainWindow)
+	DialogCopySuccess()
+	return
 }
 
 func DownloadDelEvent() {
-	_ = data.SetDownloadData(&data.DownloadNow{
-		Path:       "",
-		IsPassword: false,
-		Password:   "",
-	})
-	_ = data.SetOperationLog(&data.OperationLog{
-		Time:  time.Now().Format(utils.TimeTemplate),
-		Event: "删除了对外下载文件",
-	})
-	NowDownloadFilePath = ""
-	DownloadContainerShow()
-	dialog.ShowInformation("删除成功", "已删除文件对外提供的下载链接!", MainWindow)
+	if NowDownloadFilePath != "" {
+		_ = data.SetDownloadData(&data.DownloadNow{
+			Path:       "",
+			IsPassword: false,
+			Password:   "",
+		})
+		_ = data.SetOperationLog(&data.OperationLog{
+			Time:  time.Now().Format(utils.TimeTemplate),
+			Event: "删除了对外下载文件",
+		})
+		NowDownloadFilePath = ""
+		DownloadContainerShow()
+	}
+	DialogDelSuccess(MLTDownloadDelSuccess)
+	return
 }
 
 func DownloadPasswordEvent(value string) {
 	password := widget.NewPasswordEntry()
-	//password.Validator = validation.NewRegexp(`^[A-Za-z0-9_-]+$`, "password can only contain letters, numbers, '_', and '-'")
 	password.SetText(value)
 	items := []*widget.FormItem{
-		widget.NewFormItem("Password", password),
+		widget.NewFormItem(MLGet(MLTSetPassword), password),
 	}
-	passwordDialog := dialog.NewForm("设置密码", "保存", "取消", items, func(b bool) {
+	passwordDialog := dialog.NewForm(MLGet(MLTDownloadPasswordTitle), MLGet(MLTSave), MLGet(MLTCancel), items, func(b bool) {
 		logger.Info("Please Authenticate", password.Text)
 		newDownloadData := &data.DownloadNow{
 			Path:       NowDownloadFilePath,
@@ -124,7 +127,7 @@ func DownloadLogEvent() {
 	for _, v := range logList {
 		content.Add(widget.NewLabel(fmt.Sprintf("%s | %s| %s| %s | %s", v.Time, v.Path, v.Size, v.IP, v.UserAgent)))
 	}
-	downloadDialog := dialog.NewCustom("下载日志", "关闭", container.NewScroll(content), MainWindow)
-	downloadDialog.Resize(fyne.NewSize(500, 600))
+	downloadDialog := dialog.NewCustom(MLGet(MLTLog), MLGet(MLTClose), container.NewScroll(content), MainWindow)
+	downloadDialog.Resize(fyne.NewSize(1400, 700))
 	downloadDialog.Show()
 }

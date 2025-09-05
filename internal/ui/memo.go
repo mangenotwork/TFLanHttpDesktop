@@ -17,7 +17,7 @@ var MemoEntry = widget.NewMultiLineEntry()
 var MemoEntryContainer *fyne.Container
 var ListContainer *fyne.Container
 var MemoListContainer *fyne.Container
-var NowMemoId string = ""
+var NowMemoId = ""
 
 func MemoListShow() {
 	// 备忘录
@@ -58,34 +58,39 @@ func MemoListShow() {
 }
 
 func MemoShow() {
-	logger.Debug("显示备忘录")
 	MemoListShow()
 	ListContainerTop := container.NewVBox(
 		layout.NewSpacer(),
 	)
+
+	addMemoBtn := &widget.Button{
+		Text: ML(MLTAddMemoBtn),
+		Icon: theme.ContentAddIcon(),
+		OnTapped: func() {
+			logger.Debug("新建备忘录")
+			NewMemoEvent(false, "")
+		},
+	}
+	RegisterTranslatable(MLTAddMemoBtn, addMemoBtn)
+
+	importTxtBtn := &widget.Button{
+		Text: ML(MLTImportTxtBtn),
+		Icon: theme.FolderOpenIcon(),
+		OnTapped: func() {
+			logger.Debug("导入本地txt")
+			ImportTxtEvent()
+		},
+	}
+	RegisterTranslatable(MLTImportTxtBtn, importTxtBtn)
+
 	ListContainerTop.Add(container.NewHBox(
-		&widget.Button{
-			Text: "共享备忘录",
-			Icon: theme.ContentAddIcon(),
-			OnTapped: func() {
-				logger.Debug("新建备忘录")
-				NewMemoEvent(false, "")
-			},
-		},
-		&widget.Button{
-			Text: "导入本地txt",
-			Icon: theme.FolderOpenIcon(),
-			OnTapped: func() {
-				logger.Debug("导入本地txt")
-				ImportTxtEvent()
-			},
-		},
+		addMemoBtn,
+		importTxtBtn,
 		&widget.Button{
 			Icon: theme.ViewRefreshIcon(),
 			OnTapped: func() {
-				logger.Debug("刷新")
 				MemoListShow()
-				dialog.ShowInformation("刷新成功", "刷新成功!", MainWindow)
+				dialog.ShowInformation(MLGet(MLTDialogTipTitle), MLGet(MLTRefreshSuccess), MainWindow)
 			},
 		},
 		layout.NewSpacer(),
@@ -113,61 +118,73 @@ func MemoEntryContainerShow(id string) {
 
 	memoUrl := fmt.Sprintf("%s/memo/%s", define.DoMain, id)
 
+	refreshBtn := &widget.Button{
+		Text: ML(MLTRefresh),
+		//Icon: theme.NavigateNextIcon(),
+		OnTapped: func() {
+			newContent, newContentErr := data.GetMemoContent(NowMemoId)
+			if newContentErr != nil {
+				logger.Error(newContentErr)
+				dialog.ShowError(newContentErr, MainWindow)
+			}
+			MemoEntry.SetText(newContent.String())
+			MemoEntry.Refresh()
+			dialog.ShowInformation(MLGet(MLTDialogTipTitle), MLGet(MLTRefreshSuccess), MainWindow)
+		},
+	}
+	RegisterTranslatable(MLTRefresh, refreshBtn)
+
+	copyBtn := &widget.Button{
+		Text: ML(MLTCopy),
+		//Icon: theme.NavigateNextIcon(),
+		OnTapped: func() {
+			CopyMemoEvent(memoUrl)
+		},
+	}
+	RegisterTranslatable(MLTCopy, copyBtn)
+
+	openQrBtn := &widget.Button{
+		Text: ML(MLTOpenQr),
+		OnTapped: func() {
+			OpenMemoEvent(memoUrl)
+		},
+	}
+	RegisterTranslatable(MLTOpenQr, openQrBtn)
+
+	delBtn := &widget.Button{
+		Text: ML(MLTDel),
+		//Icon: theme.NavigateNextIcon(),
+		OnTapped: func() {
+			DelMemoEvent()
+		},
+	}
+	RegisterTranslatable(MLTDel, delBtn)
+
+	editPropertiesBtn := &widget.Button{
+		Text: ML(MLTEditProperties),
+		//Icon: theme.NavigateNextIcon(),
+		OnTapped: func() {
+			NewMemoEvent(true, NowMemoId)
+		},
+	}
+	RegisterTranslatable(MLTEditProperties, editPropertiesBtn)
+
+	saveAsTxtBtn := &widget.Button{
+		Text: ML(MLTSaveAsTxt),
+		//Icon: theme.NavigateNextIcon(),
+		OnTapped: func() {
+			MemoSaveToTxt()
+		},
+	}
+	RegisterTranslatable(MLTSaveAsTxt, saveAsTxtBtn)
+
 	entryLoremIpsumBtn := container.NewHBox(layout.NewSpacer(),
-		&widget.Button{
-			Text: "刷新",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("刷新")
-				newContent, newContentErr := data.GetMemoContent(NowMemoId)
-				if newContentErr != nil {
-					logger.Error(newContentErr)
-					dialog.ShowError(newContentErr, MainWindow)
-				}
-				MemoEntry.SetText(newContent.String())
-				MemoEntry.Refresh()
-				dialog.ShowInformation("刷新成功", "刷新成功!", MainWindow)
-			},
-		},
-		&widget.Button{
-			Text: "复制链接",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("复制链接")
-				CopyMemoEvent(memoUrl)
-			},
-		},
-		&widget.Button{
-			Text: "打开二维码",
-			OnTapped: func() {
-				logger.Debug("打开二维码")
-				OpenMemoEvent(memoUrl)
-			},
-		},
-		&widget.Button{
-			Text: "删除",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("删除")
-				DelMemoEvent()
-			},
-		},
-		&widget.Button{
-			Text: "编辑属性",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("编辑属性")
-				NewMemoEvent(true, NowMemoId)
-			},
-		},
-		&widget.Button{
-			Text: "另存为txt",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("另存为txt")
-				MemoSaveToTxt()
-			},
-		},
+		refreshBtn,
+		copyBtn,
+		openQrBtn,
+		delBtn,
+		editPropertiesBtn,
+		saveAsTxtBtn,
 		layout.NewSpacer())
 
 	MemoEntryContainer.Add(container.NewBorder(nil, entryLoremIpsumBtn, nil, nil, MemoEntry))

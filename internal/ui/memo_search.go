@@ -13,7 +13,7 @@ import (
 // NewSearchBox 创建搜索框组件
 func NewSearchBox() *fyne.Container {
 	entry := widget.NewEntry()
-	entry.SetPlaceHolder("输入关键词搜索内容")
+	entry.SetPlaceHolder(ML(MLTEnterSearch))
 	entry.OnChanged = func(s string) {
 		logger.Debug("搜索 ", s)
 
@@ -25,6 +25,7 @@ func NewSearchBox() *fyne.Container {
 		popupShow(s)
 
 	} // 支持回车搜索
+	RegisterTranslatable(MLTEnterSearch, entry)
 	entryContainer := container.NewStack(entry)
 	return entryContainer
 }
@@ -53,7 +54,6 @@ func popupShow(s string) {
 
 	dataList := make(map[int]*data.Memo)
 	for i, v := range result {
-		logger.Debug("搜索结果： ", v)
 		memoData, _ := data.GetMemoInfo(v.MemoId)
 		dataList[i] = memoData
 	}

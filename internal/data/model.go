@@ -69,3 +69,5 @@ type CiList struct {
 	MemoId        string
 	WordFrequency int // 词频,用于排序
 }
+
+// todo  Operation event 定义

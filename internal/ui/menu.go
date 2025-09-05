@@ -14,9 +14,13 @@ import (
 	"net/url"
 )
 
+var FileMenu *fyne.Menu
+var HelpMenu *fyne.Menu
+
 // MakeMenu 菜单
 func MakeMenu() *fyne.MainMenu {
-	newItem := fyne.NewMenuItem("打开", nil)
+	newItem := fyne.NewMenuItem(ML(MLTOpen), nil)
+	RegisterTranslatable(MLTOpen, newItem)
 	fileItem := fyne.NewMenuItem("打开图片", func() {
 		//openImgFile(MainWindow)
 	})
@@ -32,7 +36,7 @@ func MakeMenu() *fyne.MainMenu {
 	)
 
 	openSettings := func() {
-		w := MainApp.NewWindow("设置")
+		w := MainApp.NewWindow(MLGet(MLTSettings))
 		w.SetContent(settings.NewSettings().LoadAppearanceScreen(w))
 		w.Resize(fyne.NewSize(440, 520))
 		w.Show()
@@ -49,7 +53,7 @@ func MakeMenu() *fyne.MainMenu {
 		downloadDialog.Show()
 	}
 	showAbout := func() {
-		w := MainApp.NewWindow("关于")
+		w := MainApp.NewWindow(MLGet(MLTAbout))
 		w.SetContent(widget.NewLabel("TFLanHttpDesktop\nTransfer Files from LAN Http Desktop, 用于局域网内指定文件生成二维码或链接提供给三方设备用局域网http协议下载文件，三方设备也可以上传文件，桌面应用程序，跨平台。"))
 		w.Show()
 	}
@@ -60,46 +64,66 @@ func MakeMenu() *fyne.MainMenu {
 		ComponentDialogContainer.Show()
 	}
 
-	aboutItem := fyne.NewMenuItem("关于", showAbout)
-	settingsItem := fyne.NewMenuItem("设置", openSettings)
-	langItem := fyne.NewMenuItem("语言", lang)
-	operationLogItem := fyne.NewMenuItem("系统日志", operationLog)
+	aboutItem := fyne.NewMenuItem(ML(MLTAbout), showAbout)
+	RegisterTranslatable(MLTAbout, aboutItem)
+
+	settingsItem := fyne.NewMenuItem(ML(MLTSettings), openSettings)
+	RegisterTranslatable(MLTSettings, settingsItem)
+
+	langItem := fyne.NewMenuItem(ML(MLTLanguage), lang)
+	RegisterTranslatable(MLTLanguage, langItem)
+
+	operationLogItem := fyne.NewMenuItem(ML(MLTSystemLog), operationLog)
+	RegisterTranslatable(MLTSystemLog, operationLogItem)
+
 	settingsShortcut := &desktop.CustomShortcut{KeyName: fyne.KeyComma, Modifier: fyne.KeyModifierShortcutDefault}
 	settingsItem.Shortcut = settingsShortcut
 	MainWindow.Canvas().AddShortcut(settingsShortcut, func(shortcut fyne.Shortcut) {
 		openSettings()
 	})
 
-	helpMenu := fyne.NewMenu("帮助",
-		fyne.NewMenuItem("使用文档", func() {
-			u, _ := url.Parse("https://github.com/mangenotwork/MyPicViu")
-			_ = MainApp.OpenURL(u)
-		}),
-		fyne.NewMenuItem("项目地址", func() {
-			u, _ := url.Parse("https://github.com/mangenotwork/MyPicViu")
-			_ = MainApp.OpenURL(u)
-		}),
-		fyne.NewMenuItem("新版本", func() {
-			u, _ := url.Parse("https://github.com/mangenotwork/MyPicViu")
-			_ = MainApp.OpenURL(u)
-		}),
-		fyne.NewMenuItemSeparator(),
-		fyne.NewMenuItem("联系作者", func() {
-			u, _ := url.Parse("https://github.com/mangenotwork/MyPicViu")
-			_ = MainApp.OpenURL(u)
-		}))
+	documentation := fyne.NewMenuItem(ML(MLTDocumentation), func() {
+		u, _ := url.Parse("https://github.com/mangenotwork/TFLanHttpDesktop")
+		_ = MainApp.OpenURL(u)
+	})
+	RegisterTranslatable(MLTDocumentation, documentation)
 
-	// a quit item will be appended to our first (File) menu
-	file := fyne.NewMenu("文件", newItem)
+	projectAddress := fyne.NewMenuItem(ML(MLTProjectAddress), func() {
+		u, _ := url.Parse("https://github.com/mangenotwork/TFLanHttpDesktop")
+		_ = MainApp.OpenURL(u)
+	})
+	RegisterTranslatable(MLTProjectAddress, projectAddress)
+
+	newVersion := fyne.NewMenuItem(ML(MLTNewVersion), func() {
+		u, _ := url.Parse("https://github.com/mangenotwork/TFLanHttpDesktop")
+		_ = MainApp.OpenURL(u)
+	})
+	RegisterTranslatable(MLTNewVersion, newVersion)
+
+	contactTheAuthor := fyne.NewMenuItem(ML(MLTContactTheAuthor), func() {
+		u, _ := url.Parse("https://github.com/mangenotwork/TFLanHttpDesktop")
+		_ = MainApp.OpenURL(u)
+	})
+	RegisterTranslatable(MLTContactTheAuthor, contactTheAuthor)
+
+	HelpMenu = fyne.NewMenu(ML(MLTHelp), documentation, projectAddress, newVersion, contactTheAuthor)
+	RegisterTranslatable(MLTHelp, HelpMenu)
+
+	FileMenu = fyne.NewMenu(ML(MLTFile), newItem)
+	RegisterTranslatable(MLTFile, FileMenu)
+
 	device := fyne.CurrentDevice()
 	if !device.IsMobile() && !device.IsBrowser() {
-		file.Items = append(file.Items, fyne.NewMenuItemSeparator(), settingsItem)
+		FileMenu.Items = append(FileMenu.Items, fyne.NewMenuItemSeparator(), settingsItem)
 	}
-	file.Items = append(file.Items, operationLogItem)
-	file.Items = append(file.Items, langItem)
-	file.Items = append(file.Items, aboutItem)
-	return fyne.NewMainMenu(
-		file,
-		helpMenu,
+	FileMenu.Items = append(FileMenu.Items, operationLogItem)
+	FileMenu.Items = append(FileMenu.Items, langItem)
+	FileMenu.Items = append(FileMenu.Items, aboutItem)
+
+	menu := fyne.NewMainMenu(
+		FileMenu,
+		HelpMenu,
 	)
+
+	return menu
 }

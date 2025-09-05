@@ -2,7 +2,6 @@ package ui
 
 import (
 	"TFLanHttpDesktop/common/define"
-	"TFLanHttpDesktop/common/logger"
 	"TFLanHttpDesktop/common/utils"
 	"TFLanHttpDesktop/internal/data"
 	"bytes"
@@ -22,14 +21,14 @@ var DownloadContainer = container.New(layout.NewVBoxLayout())
 var NowDownloadFilePath = ""
 
 func DownloadContainerShow() {
-	logger.Debug("渲染下载页面 下载文件: ", NowDownloadFilePath)
 	downloadData, _ := data.GetDownloadData()
 	DownloadContainer.RemoveAll()
-	DownloadTitle := canvas.NewText(fmt.Sprintf("下载文件: %s", NowDownloadFilePath), nil)
+	DownloadTitle := canvas.NewText(ML(MLTDownloadTitle, NowDownloadFilePath), nil)
+	RegisterTranslatable(MLTDownloadTitle, DownloadTitle, NowDownloadFilePath)
 	DownloadTitle.TextStyle = fyne.TextStyle{
 		Bold: true,
 	}
-	DownloadTitle.TextSize = 16
+	DownloadTitle.TextSize = 14
 	DownloadTitleContainer := container.NewCenter(DownloadTitle)
 	DownloadContainer.Add(layout.NewSpacer())
 	downloadUrl := ""
@@ -40,15 +39,18 @@ func DownloadContainerShow() {
 		DownloadContainer.Add(DownloadTitleContainer)
 		qrImg, _ := utils.GetQRCodeIO(downloadUrl)
 		reader := bytes.NewReader(qrImg)
-		DownloadQr := canvas.NewImageFromReader(reader, "移动设备在同一WiFi内扫码下载")
+		DownloadQr := canvas.NewImageFromReader(reader, "")
 		DownloadQr.FillMode = canvas.ImageFillOriginal
 		DownloadContainer.Add(DownloadQr)
-		DownloadQrText := canvas.NewText("移动设备在同一WiFi内扫码下载", nil)
+		DownloadQrText := canvas.NewText(ML(MLTDownloadQrText), nil)
+		RegisterTranslatable(MLTDownloadQrText, DownloadQrText)
 		DownloadQrText.TextSize = 11
 		DownloadQrTextContainer := container.NewCenter(DownloadQrText)
 		DownloadContainer.Add(DownloadQrTextContainer)
 	} else {
-		DownloadContainer.Add(container.NewCenter(widget.NewLabel("选择提供下载的文件")))
+		choiceDownloadLabel := widget.NewLabel(ML(MLTChoiceDownloadLabel))
+		RegisterTranslatable(MLTChoiceDownloadLabel, choiceDownloadLabel)
+		DownloadContainer.Add(container.NewCenter(choiceDownloadLabel))
 	}
 	DownloadContainer.Add(layout.NewSpacer())
 
@@ -57,7 +59,6 @@ func DownloadContainerShow() {
 		Text: ML(MLTSelectFile),
 		Icon: theme.FileIcon(),
 		OnTapped: func() {
-			logger.Debug("选择文件")
 			DownloadEvent()
 		},
 	}
@@ -68,39 +69,46 @@ func DownloadContainerShow() {
 		Text: ML(MLTCopy),
 		//Icon: theme.NavigateNextIcon(),
 		OnTapped: func() {
-			logger.Debug("复制下载链接")
 			DownloadCopyUrlEvent(downloadUrl)
 		},
 	}
 	RegisterTranslatable(MLTCopy, downloadCopyBtn)
 
+	// 删除按钮
+	downloadDelBtn := &widget.Button{
+		Text: ML(MLTDel),
+		//Icon: theme.NavigateNextIcon(),
+		OnTapped: func() {
+			DownloadDelEvent()
+		},
+	}
+	RegisterTranslatable(MLTDel, downloadDelBtn)
+
+	// 设置密码
+	setPasswordBtn := &widget.Button{
+		Text: ML(MLTSetPassword),
+		//Icon: theme.NavigateNextIcon(),
+		OnTapped: func() {
+			DownloadPasswordEvent(downloadData.Password)
+		},
+	}
+	RegisterTranslatable(MLTSetPassword, setPasswordBtn)
+
+	logBtn := &widget.Button{
+		Text: ML(MLTLog),
+		//Icon: theme.NavigateNextIcon(),
+		OnTapped: func() {
+			DownloadLogEvent()
+		},
+	}
+	RegisterTranslatable(MLTLog, logBtn)
+
 	DownloadTool := container.NewHBox(layout.NewSpacer(),
 		openFileBtn,
 		downloadCopyBtn,
-		&widget.Button{
-			Text: "删除",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("删除下载")
-				DownloadDelEvent()
-			},
-		},
-		&widget.Button{
-			Text: "密码",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("设置密码")
-				DownloadPasswordEvent(downloadData.Password)
-			},
-		},
-		&widget.Button{
-			Text: "日志",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("下载日志")
-				DownloadLogEvent()
-			},
-		},
+		downloadDelBtn,
+		setPasswordBtn,
+		logBtn,
 		layout.NewSpacer())
 	DownloadToolContainer := container.NewCenter(DownloadTool)
 	DownloadContainer.Add(layout.NewSpacer())
