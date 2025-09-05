@@ -57,7 +57,7 @@ func main() {
 	icon, _ := fyne.LoadResourceFromPath("./icon.png")
 	ui.MainApp.SetIcon(icon)
 
-	ui.MainWindow = ui.MainApp.NewWindow(ui.T("appTitle"))
+	ui.MainWindow = ui.MainApp.NewWindow(ui.ML(ui.MLTAppTitle))
 	logger.Debug("初始化UI")
 
 	ui.LogLifecycle(ui.MainApp)

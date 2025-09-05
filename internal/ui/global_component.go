@@ -7,9 +7,9 @@ import (
 )
 
 // ComponentSwitchLangBtn 切换中英文按钮
-var ComponentSwitchLangBtn = widget.NewButton(T("switchLangBtn"), func() {
+var ComponentSwitchLangBtn = widget.NewButton(ML(MLTSwitchLangBtnText), func() {
 	// 切换语言（会触发全局事件）
-	if T("switchLangBtn") == "切换到英文" {
+	if ML(MLTSwitchLangBtnText) == translations["zh-CN"][MLTSwitchLangBtnText] {
 		SetLang("en")
 	} else {
 		SetLang("zh-CN")
@@ -20,5 +20,5 @@ var ComponentSwitchLangBtn = widget.NewButton(T("switchLangBtn"), func() {
 var ComponentDialogContainer *dialog.CustomDialog
 
 func NewComponentDialogContainer() *dialog.CustomDialog {
-	return dialog.NewCustom(T("DialogContainerTitle"), T("DialogContainerDismiss"), container.NewCenter(ComponentSwitchLangBtn), MainWindow)
+	return dialog.NewCustom(ML(MLTDialogContainerTitle), ML(MLTDialogContainerDismiss), container.NewCenter(ComponentSwitchLangBtn), MainWindow)
 }

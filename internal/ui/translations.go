@@ -6,23 +6,35 @@ import (
 	"sync"
 )
 
+const (
+	MLTAppTitle               = "MLTAppTitle"               // 应用标题
+	MLTWelcomeText            = "MLTWelcomeText"            // 应用欢迎语
+	MLTSwitchLangBtnText      = "MLTSwitchLangBtnText"      // 切换语言按钮文本
+	MLTDialogContainerTitle   = "MLTDialogContainerTitle"   // 切换语言弹框标题
+	MLTDialogContainerDismiss = "MLTDialogContainerDismiss" // 切换语言弹框关闭按钮文本
+	MLTCopy                   = "MLTCopy"                   // 复制文案
+	MLTSelectFile             = "MLTSelectFile"             // 选择文件文案
+)
+
 // 1. 翻译映射表
 var translations = map[string]map[string]string{
 	"en": {
-		"appTitle":               "TFLanHttpDesktop",
-		"welcomeText":            "Welcome to TFLanHttpDesktop, Generate a QR code or link for third-party devices within the local network to download or upload specified files, a desktop application, cross-platform, and green (portable, no installation required).",
-		"switchLangBtn":          "Switch to Chinese",
-		"DialogContainerTitle":   "lang",
-		"DialogContainerDismiss": "close",
-		"copy":                   "copy",
+		MLTAppTitle:               "TFLanHttpDesktop",
+		MLTWelcomeText:            "Welcome to TFLanHttpDesktop, Generate a QR code or link for third-party devices within the local network to download or upload specified files, a desktop application, cross-platform, and green (portable, no installation required).",
+		MLTSwitchLangBtnText:      "Switch to Chinese",
+		MLTDialogContainerTitle:   "Lang",
+		MLTDialogContainerDismiss: "Close",
+		MLTCopy:                   "Copy",
+		MLTSelectFile:             "Select File",
 	},
 	"zh-CN": {
-		"appTitle":               "TFLanHttpDesktop 内网传输工具",
-		"welcomeText":            "欢迎使用 TFLanHttpDesktop , Transfer Files from LAN Http Desktop, 生成二维码或链接提供给局域网内的三方设备下载指定文件和上传文件，桌面应用程序，跨平台，绿色免安装",
-		"switchLangBtn":          "切换到英文",
-		"DialogContainerTitle":   "语言偏好",
-		"DialogContainerDismiss": "关闭",
-		"copy":                   "复制",
+		MLTAppTitle:               "TFLanHttpDesktop 内网传输工具",
+		MLTWelcomeText:            "欢迎使用 TFLanHttpDesktop , Transfer Files from LAN Http Desktop, 生成二维码或链接提供给局域网内的三方设备下载指定文件和上传文件，桌面应用程序，跨平台，绿色免安装",
+		MLTSwitchLangBtnText:      "切换到英文",
+		MLTDialogContainerTitle:   "语言偏好",
+		MLTDialogContainerDismiss: "关闭",
+		MLTCopy:                   "复制",
+		MLTSelectFile:             "选择文件",
 	},
 }
 
@@ -37,10 +49,10 @@ var bus = &EventBus{}
 func InitBus() {
 	bus.OnLangChanged(func() {
 		// 窗口标题刷新
-		MainWindow.SetTitle(T("appTitle"))
+		MainWindow.SetTitle(ML(MLTAppTitle))
 
 		// 语言偏好
-		ComponentSwitchLangBtn.SetText(T("switchLangBtn"))
+		ComponentSwitchLangBtn.SetText(ML(MLTSwitchLangBtnText))
 		if ComponentDialogContainer != nil {
 			ComponentDialogContainer.Hide()
 		}
@@ -86,7 +98,7 @@ func SetLang(lang string) {
 	translatableComponents.Lock()
 	defer translatableComponents.Unlock()
 	for key, components := range translatableComponents.list {
-		text := T(key)
+		text := ML(key)
 		for _, comp := range components {
 			switch c := comp.(type) {
 			case *widget.Label:
@@ -100,8 +112,8 @@ func SetLang(lang string) {
 	}
 }
 
-// 获取翻译文本
-func T(key string) string {
+// ML 多语言 multilingual
+func ML(key string) string {
 	langMu.Lock()
 	lang := currentLang
 	langMu.Unlock()

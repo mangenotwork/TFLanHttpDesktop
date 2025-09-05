@@ -1,20 +1,14 @@
 package ui
 
 import (
-	"TFLanHttpDesktop/common/define"
 	"TFLanHttpDesktop/common/logger"
-	"TFLanHttpDesktop/common/utils"
 	"TFLanHttpDesktop/internal/data"
-	"bytes"
-	"fmt"
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/driver/desktop"
-	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"net/url"
 )
 
 var MainApp fyne.App
@@ -35,25 +29,49 @@ func LogLifecycle(a fyne.App) {
 	})
 }
 
+// MakeTray 系统托盘
 func MakeTray(a fyne.App) {
 	if desk, ok := a.(desktop.App); ok {
-		h := fyne.NewMenuItem("Hello", func() {})
-		h.Icon = theme.HomeIcon()
-		menu := fyne.NewMenu("Hello World", h)
-		h.Action = func() {
+		menuItem := fyne.NewMenuItem("TFLanHttpDesktop", func() {})
+		menuItem.Icon = theme.HomeIcon()
+		menuItem.Action = func() {
 			logger.Debug("System tray menu tapped")
-			h.Label = "Welcome"
-			menu.Refresh()
+
+			// 关键步骤1：确保窗口可见（无论之前是隐藏还是最小化）
+			MainWindow.Show()
+
+			// 关键步骤2：将窗口置于前台并获取焦点
+			MainWindow.RequestFocus()
+
+			// 可选：更新菜单项文本
+			menuItem.Label = "应用已打开"
+			//// 刷新菜单显示
+			//if menu := menuItem.Menu; menu != nil {
+			//	menu.Refresh()
+			//}
 		}
-		desk.SetSystemTrayMenu(menu)
+
+		domain := fyne.NewMenuItem("项目网站", func() {
+		})
+		domain.Action = func() {
+			u, _ := url.Parse("https://github.com/mangenotwork/TFLanHttpDesktop")
+			_ = MainApp.OpenURL(u)
+		}
+
+		trayMenu := fyne.NewMenu(
+			"TFLanHttpDesktop", // 菜单名称（桌面平台显示用）
+			menuItem,           // 第一个菜单项
+			domain,             // 第二个菜单项
+			// 可继续添加更多菜单项...
+			// todo... 浏览器打开下载
+			// todo... 浏览器打开上传
+		)
+		desk.SetSystemTrayMenu(trayMenu)
 	}
 }
 
 var RightContainer *container.Split
 var LeftContainer *container.Split
-
-var DownloadContainer = container.New(layout.NewVBoxLayout())
-var UploadContainer = container.New(layout.NewVBoxLayout())
 
 func MainContent() *container.Split {
 	MemoShow()
@@ -85,203 +103,6 @@ func MainContent() *container.Split {
 	return mainContent
 }
 
-func DownloadContainerShow() {
-	logger.Debug("渲染下载页面 下载文件: ", NowDownloadFilePath)
-	downloadData, _ := data.GetDownloadData()
-	DownloadContainer.RemoveAll()
-	DownloadTitle := canvas.NewText(fmt.Sprintf("下载文件: %s", NowDownloadFilePath), nil)
-	DownloadTitle.TextStyle = fyne.TextStyle{
-		Bold: true,
-	}
-	DownloadTitle.TextSize = 16
-	DownloadTitleContainer := container.NewCenter(DownloadTitle)
-	DownloadContainer.Add(layout.NewSpacer())
-	downloadUrl := ""
-	if NowDownloadFilePath != "" {
-		nowMd5 := utils.GetMD5Encode(NowDownloadFilePath)
-		define.DownloadMem[nowMd5] = NowDownloadFilePath
-		downloadUrl = fmt.Sprintf("%s/download/%s", define.DoMain, nowMd5)
-		DownloadContainer.Add(DownloadTitleContainer)
-		qrImg, _ := utils.GetQRCodeIO(downloadUrl)
-		reader := bytes.NewReader(qrImg)
-		DownloadQr := canvas.NewImageFromReader(reader, "移动设备在同一WiFi内扫码下载")
-		DownloadQr.FillMode = canvas.ImageFillOriginal
-		DownloadContainer.Add(DownloadQr)
-		DownloadQrText := canvas.NewText("移动设备在同一WiFi内扫码下载", nil)
-		DownloadQrText.TextSize = 11
-		DownloadQrTextContainer := container.NewCenter(DownloadQrText)
-		DownloadContainer.Add(DownloadQrTextContainer)
-	} else {
-		DownloadContainer.Add(container.NewCenter(widget.NewLabel("选择提供下载的文件")))
-	}
-	DownloadContainer.Add(layout.NewSpacer())
-
-	downloadCopy := &widget.Button{
-		Text: T("copy"),
-		//Icon: theme.NavigateNextIcon(),
-		OnTapped: func() {
-			logger.Debug("复制下载链接")
-			DownloadCopyUrlEvent(downloadUrl)
-		},
-	}
-	RegisterTranslatable("copy", downloadCopy)
-
-	DownloadTool := container.NewHBox(layout.NewSpacer(),
-		&widget.Button{
-			Text: "选择文件",
-			Icon: theme.FileIcon(),
-			OnTapped: func() {
-				logger.Debug("选择文件")
-				DownloadEvent()
-			},
-		},
-		//&widget.Button{
-		//	Text: "复制",
-		//	//Icon: theme.NavigateNextIcon(),
-		//	OnTapped: func() {
-		//		logger.Debug("复制下载链接")
-		//		DownloadCopyUrlEvent(downloadUrl)
-		//	},
-		//},
-		downloadCopy,
-		&widget.Button{
-			Text: "删除",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("删除下载")
-				DownloadDelEvent()
-			},
-		},
-		&widget.Button{
-			Text: "密码",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("设置密码")
-				DownloadPasswordEvent(downloadData.Password)
-			},
-		},
-		&widget.Button{
-			Text: "日志",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("下载日志")
-				DownloadLogEvent()
-			},
-		},
-		layout.NewSpacer())
-	DownloadToolContainer := container.NewCenter(DownloadTool)
-	DownloadContainer.Add(layout.NewSpacer())
-	DownloadContainer.Add(DownloadToolContainer)
-	DownloadContainer.Add(layout.NewSpacer())
-	DownloadContainer.Refresh()
-}
-
-func UploadContainerShow() {
-	logger.Debug("渲染上传页面 上传目录: ", NowUploadFilePath)
-	uploadData, _ := data.GetUploadData()
-	UploadContainer.RemoveAll()
-	UploadTitle := canvas.NewText(fmt.Sprintf("接收目录: %s", NowUploadFilePath), nil)
-	UploadTitle.TextStyle = fyne.TextStyle{
-		Bold: true,
-	}
-	UploadContainer.Add(layout.NewSpacer())
-	UploadTitle.TextSize = 16
-	uploadUrl := ""
-	if NowUploadFilePath != "" {
-
-		nowMd5 := utils.GetMD5Encode(NowUploadFilePath)
-		define.UploadMem[nowMd5] = NowUploadFilePath
-		uploadUrl = fmt.Sprintf("%s/upload/%s", define.DoMain, nowMd5)
-
-		UploadTitleContainer := container.NewCenter(UploadTitle)
-
-		UploadContainer.Add(UploadTitleContainer)
-		UploadContainer.Add(layout.NewSpacer())
-		qrImgUpload, _ := utils.GetQRCodeIO(uploadUrl)
-		readerUpload := bytes.NewReader(qrImgUpload)
-		UploadQr := canvas.NewImageFromReader(readerUpload, "移动设备在同一WiFi内扫码上传")
-		UploadQr.FillMode = canvas.ImageFillOriginal
-		UploadContainer.Add(UploadQr)
-		UploadQrText := canvas.NewText("移动设备在同一WiFi内扫码上传", nil)
-		UploadQrText.TextSize = 11
-		UploadQrTextContainer := container.NewCenter(UploadQrText)
-		UploadContainer.Add(UploadQrTextContainer)
-	} else {
-		logger.Debug("当前没有选择目录")
-		UploadContainer.Add(container.NewCenter(widget.NewLabel("选择目录接收上传文件")))
-	}
-
-	uploadCopy := &widget.Button{
-		Text: T("copy"),
-		//Icon: theme.NavigateNextIcon(),
-		OnTapped: func() {
-			logger.Debug("复制上传链接")
-			UploadCopyUrlEvent(uploadUrl)
-		},
-	}
-	RegisterTranslatable("copy", uploadCopy)
-
-	UploadTool := container.NewHBox(layout.NewSpacer(),
-		&widget.Button{
-			Text: "指定接收上传目录",
-			Icon: theme.FolderIcon(),
-			OnTapped: func() {
-				logger.Debug("指定接收上传目录")
-				UploadEvent()
-			},
-		},
-		//&widget.Button{
-		//	Text: "复制",
-		//	//Icon: theme.NavigateNextIcon(),
-		//	OnTapped: func() {
-		//		logger.Debug("复制上传链接")
-		//		UploadCopyUrlEvent(uploadUrl)
-		//	},
-		//},
-		uploadCopy,
-		&widget.Button{
-			Text: "删除",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("删除上传")
-				UploadDelEvent()
-			},
-		},
-		&widget.Button{
-			Text: "密码",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("密码管理")
-				UploadPasswordEvent(uploadData.Password)
-			},
-		},
-		//&widget.Button{
-		//	Text: "限制类型",
-		//	//Icon: theme.NavigateNextIcon(),
-		//	OnTapped: func() {
-		//		logger.Debug("密码管理")
-		//		// todo ...
-		//	},
-		//},
-		&widget.Button{
-			Text: "日志",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("接收日志")
-				UploadLogEvent()
-			},
-		},
-		layout.NewSpacer())
-	UploadToolContainer := container.NewCenter(UploadTool)
-	UploadContainer.Add(layout.NewSpacer())
-	UploadContainer.Add(UploadToolContainer)
-	UploadContainer.Add(layout.NewSpacer())
-	UploadContainer.Refresh()
-}
-
-var NowDownloadFilePath = ""
-var NowUploadFilePath = ""
-
 func InitDB() {
 	downloadData, err := data.GetDownloadData()
 	if err != nil {
@@ -298,261 +119,4 @@ func InitDB() {
 	if uploadData != nil {
 		NowUploadFilePath = uploadData.Path
 	}
-}
-
-func popupShow(s string) {
-
-	fc := data.TermExtract(s)
-
-	ciList := make([]string, 0)
-
-	result := make([]*data.CiList, 0)
-
-	for _, v := range fc {
-		item := data.MatchCi(v.Text)
-		ciList = append(ciList, item...)
-	}
-
-	ciList = utils.SliceDeduplicate[string](ciList)
-
-	for _, v := range ciList {
-		item, _ := data.GetCiList(v)
-		result = append(result, item...)
-	}
-
-	result = utils.SliceDeduplicate[*data.CiList](result)
-
-	dataList := make(map[int]*data.Memo)
-	for i, v := range result {
-		logger.Debug("搜索结果： ", v)
-		memoData, _ := data.GetMemoInfo(v.MemoId)
-		dataList[i] = memoData
-	}
-
-	if MemoListContainer == nil {
-		MemoListContainer = container.NewStack()
-	}
-	MemoListContainer.RemoveAll()
-	MemoList := widget.NewList(
-		func() int {
-			return len(dataList)
-		},
-		func() fyne.CanvasObject {
-			return container.NewHBox(widget.NewIcon(theme.DocumentIcon()), widget.NewLabel("Template Object"))
-		},
-		func(id widget.ListItemID, item fyne.CanvasObject) {
-			//logger.Info("id = ", id)
-			item.(*fyne.Container).Objects[1].(*widget.Label).SetText(dataList[id].Name)
-		},
-	)
-	MemoList.OnSelected = func(id widget.ListItemID) {
-		logger.Debug("id = ", id)
-		logger.Debug("data = ", dataList[id])
-		//MemoEntry.SetText(dataList[id].Name)
-		MemoEntryContainerShow(dataList[id].Id)
-	}
-	MemoList.OnUnselected = func(id widget.ListItemID) {
-		//MemoEntry.SetText(dataList[id].Name)
-		MemoEntryContainerShow(dataList[id].Id)
-	}
-	MemoListContainer.Add(MemoList)
-	MemoListContainer.Refresh()
-
-}
-
-// 创建搜索框组件
-func NewSearchBox() *fyne.Container {
-	entry := widget.NewEntry()
-	entry.SetPlaceHolder("输入关键词搜索内容")
-	entry.OnChanged = func(s string) {
-		logger.Debug("搜索 ", s)
-
-		if s == "" {
-			MemoListShow()
-			return
-		}
-
-		popupShow(s)
-
-	} // 支持回车搜索
-	entryContainer := container.NewStack(entry)
-	return entryContainer
-}
-
-var MemoEntry = widget.NewMultiLineEntry()
-var MemoEntryContainer *fyne.Container
-var ListContainer *fyne.Container
-var MemoListContainer *fyne.Container
-var NowMemoId string = ""
-
-func MemoListShow() {
-	// 备忘录
-	memoList, _ := data.GetMemoList()
-	dataList := make(map[int]*data.Memo)
-	for i, v := range memoList {
-		dataList[i] = v
-	}
-
-	if MemoListContainer == nil {
-		MemoListContainer = container.NewStack()
-	}
-	MemoListContainer.RemoveAll()
-	MemoList := widget.NewList(
-		func() int {
-			return len(dataList)
-		},
-		func() fyne.CanvasObject {
-			return container.NewHBox(widget.NewIcon(theme.DocumentIcon()), widget.NewLabel("Template Object"))
-		},
-		func(id widget.ListItemID, item fyne.CanvasObject) {
-			//logger.Info("id = ", id)
-			item.(*fyne.Container).Objects[1].(*widget.Label).SetText(dataList[id].Name)
-		},
-	)
-	MemoList.OnSelected = func(id widget.ListItemID) {
-		logger.Debug("id = ", id)
-		logger.Debug("data = ", dataList[id])
-		//MemoEntry.SetText(dataList[id].Name)
-		MemoEntryContainerShow(dataList[id].Id)
-	}
-	MemoList.OnUnselected = func(id widget.ListItemID) {
-		//MemoEntry.SetText(dataList[id].Name)
-		MemoEntryContainerShow(dataList[id].Id)
-	}
-	MemoListContainer.Add(MemoList)
-	MemoListContainer.Refresh()
-}
-
-func MemoShow() {
-	logger.Debug("显示备忘录")
-	MemoListShow()
-	ListContainerTop := container.NewVBox(
-		layout.NewSpacer(),
-	)
-	ListContainerTop.Add(container.NewHBox(
-		&widget.Button{
-			Text: "共享备忘录",
-			Icon: theme.ContentAddIcon(),
-			OnTapped: func() {
-				logger.Debug("新建备忘录")
-				NewMemoEvent(false, "")
-			},
-		},
-		&widget.Button{
-			Text: "导入本地txt",
-			Icon: theme.FolderOpenIcon(),
-			OnTapped: func() {
-				logger.Debug("导入本地txt")
-				ImportTxtEvent()
-			},
-		},
-		&widget.Button{
-			Icon: theme.ViewRefreshIcon(),
-			OnTapped: func() {
-				logger.Debug("刷新")
-				MemoListShow()
-				dialog.ShowInformation("刷新成功", "刷新成功!", MainWindow)
-			},
-		},
-		layout.NewSpacer(),
-	))
-	ListContainerTop.Add(NewSearchBox())
-	ListContainerTop.Add(layout.NewSpacer())
-	ListContainer = container.NewBorder(ListContainerTop, nil, nil, nil, MemoListContainer)
-}
-
-// 自定义文字工具栏项（实现 ToolbarItem 接口）
-type TextToolbarItem struct {
-	*widget.Button
-}
-
-// ToolbarObject 实现 ToolbarItem 接口
-func (t *TextToolbarItem) ToolbarObject() fyne.CanvasObject {
-	return t.Button
-}
-
-// 快捷创建文字工具栏项
-func NewTextToolbarItem(label string, onTapped func()) *TextToolbarItem {
-	return &TextToolbarItem{
-		Button: widget.NewButton(label, onTapped),
-	}
-}
-
-func MemoEntryContainerShow(id string) {
-	logger.Debug("MemoEntryContainerShow... id=", id)
-
-	NowMemoId = id
-
-	content, err := data.GetMemoContent(id)
-	if err != nil {
-		logger.Error(err)
-		dialog.ShowError(err, MainWindow)
-	}
-
-	MemoEntryContainer.RemoveAll()
-	MemoEntry.Wrapping = fyne.TextWrapWord
-	MemoEntry.SetText(content.String())
-	MemoEntry.Refresh()
-
-	memoUrl := fmt.Sprintf("%s/memo/%s", define.DoMain, id)
-
-	entryLoremIpsumBtn := container.NewHBox(layout.NewSpacer(),
-		&widget.Button{
-			Text: "刷新",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("刷新")
-				newContent, newContentErr := data.GetMemoContent(NowMemoId)
-				if newContentErr != nil {
-					logger.Error(newContentErr)
-					dialog.ShowError(newContentErr, MainWindow)
-				}
-				MemoEntry.SetText(newContent.String())
-				MemoEntry.Refresh()
-				dialog.ShowInformation("刷新成功", "刷新成功!", MainWindow)
-			},
-		},
-		&widget.Button{
-			Text: "复制链接",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("复制链接")
-				CopyMemoEvent(memoUrl)
-			},
-		},
-		&widget.Button{
-			Text: "打开二维码",
-			OnTapped: func() {
-				logger.Debug("打开二维码")
-				OpenMemoEvent(memoUrl)
-			},
-		},
-		&widget.Button{
-			Text: "删除",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("删除")
-				DelMemoEvent()
-			},
-		},
-		&widget.Button{
-			Text: "编辑属性",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("编辑属性")
-				NewMemoEvent(true, NowMemoId)
-			},
-		},
-		&widget.Button{
-			Text: "另存为txt",
-			//Icon: theme.NavigateNextIcon(),
-			OnTapped: func() {
-				logger.Debug("另存为txt")
-				MemoSaveToTxt()
-			},
-		},
-		layout.NewSpacer())
-
-	MemoEntryContainer.Add(container.NewBorder(nil, entryLoremIpsumBtn, nil, nil, MemoEntry))
-	MemoEntryContainer.Refresh()
 }
