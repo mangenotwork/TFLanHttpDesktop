@@ -50,12 +50,24 @@ func popupShow(s string) {
 		result = append(result, item...)
 	}
 
-	result = utils.SliceDeduplicate[*data.CiList](result)
+	//result = utils.SliceDeduplicate[*data.CiList](result)
+
+	deduplicate := make(map[string]struct{})
 
 	dataList := make(map[int]*data.Memo)
-	for i, v := range result {
-		memoData, _ := data.GetMemoInfo(v.MemoId)
-		dataList[i] = memoData
+	i := 0
+	for _, v := range result {
+		if _, ok := deduplicate[v.MemoId]; !ok {
+			logger.Debug("v = ", v, v.MemoId)
+			memoData, err := data.GetMemoInfo(v.MemoId)
+			if err != nil {
+				logger.Error("获取失败: err=", err)
+				continue
+			}
+			dataList[i] = memoData
+			deduplicate[v.MemoId] = struct{}{}
+			i++
+		}
 	}
 
 	if MemoListContainer == nil {

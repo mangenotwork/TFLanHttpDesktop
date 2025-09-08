@@ -87,7 +87,7 @@ func DownloadExecute(ctx *gin.Context) {
 	filePath, ok := define.DownloadMem[fileKey]
 	if !ok {
 		logger.Debug("file not found")
-		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("下载链接已失效"))
+		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("链接已失效"))
 		return
 	}
 	logger.Info(filePath)
@@ -97,7 +97,7 @@ func DownloadExecute(ctx *gin.Context) {
 
 	downloadData, _ := data.GetDownloadData()
 	if downloadData.Path != filePath {
-		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("下载链接已失效"))
+		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("链接已失效"))
 		return
 	}
 	if downloadData.IsPassword && downloadData.Password != password {
@@ -151,7 +151,7 @@ func UploadPg(ctx *gin.Context) {
 	filePath, ok := define.UploadMem[fileKey]
 	if !ok {
 		logger.Debug("file not found")
-		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("下载链接已失效"))
+		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("链接已失效"))
 		return
 	}
 	logger.Info(filePath)
@@ -159,7 +159,7 @@ func UploadPg(ctx *gin.Context) {
 	uploadData, _ := data.GetUploadData()
 	logger.Debug("uploadData = ", uploadData)
 	if uploadData.Path != filePath {
-		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("下载链接已失效"))
+		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("链接已失效"))
 		return
 	}
 
@@ -203,7 +203,7 @@ func UploadExecute(ctx *gin.Context) {
 	filePath, ok := define.UploadMem[fileKey]
 	if !ok {
 		logger.Debug("file not found")
-		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("下载链接已失效"))
+		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("链接已失效"))
 		return
 	}
 	logger.Info(filePath)
@@ -211,7 +211,7 @@ func UploadExecute(ctx *gin.Context) {
 	uploadData, _ := data.GetUploadData()
 	logger.Debug("uploadData = ", uploadData)
 	if uploadData.Path != filePath {
-		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("下载链接已失效"))
+		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("链接已失效"))
 		return
 	}
 

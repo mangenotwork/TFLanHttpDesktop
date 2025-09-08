@@ -185,17 +185,18 @@ func OpenMemoEvent(memoUrl string) {
 func DelMemoEvent() {
 	dialog.ShowConfirm(MLGet(MLTDialogTipTitle), MLGet(MLTConfirmDeletion), func(b bool) {
 		if b {
-			err := data.DeleteMemo(NowMemoId)
+			oldMemoData, err := data.GetMemoInfo(NowMemoId)
 			if err != nil {
 				dialog.ShowError(err, MainWindow)
 				return
 			}
-			oldMemoData := &data.Memo{}
-			oldMemoData, err = data.GetMemoInfo(NowMemoId)
+
+			err = data.DeleteMemo(NowMemoId)
 			if err != nil {
 				dialog.ShowError(err, MainWindow)
 				return
 			}
+
 			_ = data.SetOperationLog(&data.OperationLog{
 				Time:  time.Now().Format(utils.TimeTemplate),
 				Event: fmt.Sprintf("删除了备忘录:%s ", oldMemoData.Name),

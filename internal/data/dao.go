@@ -178,15 +178,20 @@ func GetMemoContent(id string) (MemoContent, error) {
 // SetMemoContent 修改备忘录内容
 func SetMemoContent(id string, content string) (MemoContent, error) {
 	err := DB.Set(MemoContentTable, id, content)
-	now := time.Now()
-	t := now.Sub(MemoEntryTime).Seconds()
-	if t > 0.02 {
-		go func() {
-			_ = GetMemoFenCiList(id, content)
-		}()
-	}
-	logger.Debug("写入时差 : ", t)
-	MemoEntryTime = now
+	go func() {
+		_ = GetMemoFenCiList(id, content)
+	}()
+
+	//now := time.Now()
+	//t := now.Sub(MemoEntryTime).Seconds()
+	//if t > 0.02 {
+	//	go func() {
+	//		_ = GetMemoFenCiList(id, content)
+	//	}()
+	//}
+	//logger.Debug("写入时差 : ", t)
+	//MemoEntryTime = now
+
 	return MemoContent(content), err
 }
 
@@ -228,13 +233,25 @@ func SetMemoInfo(id string, name string, authority int, password string) (*Memo,
 
 // DeleteMemo 删除备忘录
 func DeleteMemo(id string) error {
+	logger.Debug("DeleteMemo = ", id)
 	err := DB.Delete(MemoTable, id)
 	if err != nil {
 		logger.Error(err)
 		return err
 	}
 	err = DB.Delete(MemoContentTable, id)
-	return err
+	if err != nil {
+		logger.Error(err)
+		return err
+	}
+
+	err = DelMemoCiList(id)
+	if err != nil {
+		logger.Error(err)
+		return err
+	}
+
+	return nil
 }
 
 // SetOperationLog 记录操作日志
@@ -294,6 +311,18 @@ func SetMemoCiList(id string, list []*MemoCiList) error {
 	return err
 }
 
+func DelMemoCiList(id string) error {
+	ciList, err := GetMemoCiList(id)
+	if err != nil {
+		logger.Error(err)
+		return err
+	}
+	for _, ci := range ciList {
+		_ = DelCiList(ci.Ci, id)
+	}
+	return FcDB.Delete(MemoCiListTable, id)
+}
+
 func MatchCi(ci string) []string {
 	result := make([]string, 0)
 	list, err := CiDB.AllKey(CiListTable)
@@ -324,4 +353,16 @@ func GetCiList(ci string) ([]*CiList, error) {
 func SetCiList(ci string, list []*CiList) error {
 	err := CiDB.Set(CiListTable, ci, &list)
 	return err
+}
+
+func DelCiList(ci string, memoId string) error {
+	list, _ := GetCiList(ci)
+
+	for i := len(list) - 1; i >= 0; i-- {
+		if list[i].MemoId == memoId {
+			list = append(list[:i], list[i+1:]...)
+		}
+	}
+
+	return SetCiList(ci, list)
 }
