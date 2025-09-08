@@ -19,21 +19,6 @@ var HelpMenu *fyne.Menu
 
 // MakeMenu 菜单
 func MakeMenu() *fyne.MainMenu {
-	newItem := fyne.NewMenuItem(ML(MLTOpen), nil)
-	RegisterTranslatable(MLTOpen, newItem)
-	fileItem := fyne.NewMenuItem("打开图片", func() {
-		//openImgFile(MainWindow)
-	})
-	fileItem.Icon = theme.FileIcon()
-	dirItem := fyne.NewMenuItem("打开目录", func() {
-		logger.Debug("Menu New->Directory")
-		//openFile(MainWindow)
-	})
-	dirItem.Icon = theme.FolderIcon()
-	newItem.ChildMenu = fyne.NewMenu("",
-		dirItem,
-		fileItem,
-	)
 
 	openSettings := func() {
 		w := MainApp.NewWindow(MLGet(MLTSettings))
@@ -63,6 +48,29 @@ func MakeMenu() *fyne.MainMenu {
 		ComponentDialogContainer.Resize(fyne.NewSize(500, 600))
 		ComponentDialogContainer.Show()
 	}
+
+	downloadItem := fyne.NewMenuItem(ML(MLTSelectFile), func() {
+		DownloadEvent()
+	})
+	downloadItem.Icon = theme.FileIcon()
+	RegisterTranslatable(MLTSelectFile, downloadItem)
+
+	uploadItem := fyne.NewMenuItem(ML(MLUploadDir), func() {
+		UploadEvent()
+	})
+	uploadItem.Icon = theme.FolderIcon()
+	RegisterTranslatable(MLUploadDir, uploadItem)
+
+	memoItem := fyne.NewMenuItem(ML(MLTAddMemoBtn), func() {
+		NewMemoEvent(false, "")
+	})
+	memoItem.Icon = theme.ContentAddIcon()
+	RegisterTranslatable(MLTAddMemoBtn, memoItem)
+
+	importMemoItem := fyne.NewMenuItem(ML(MLTImportTxtBtn), func() {
+		ImportTxtEvent()
+	})
+	RegisterTranslatable(MLTImportTxtBtn, importMemoItem)
 
 	aboutItem := fyne.NewMenuItem(ML(MLTAbout), showAbout)
 	RegisterTranslatable(MLTAbout, aboutItem)
@@ -109,7 +117,7 @@ func MakeMenu() *fyne.MainMenu {
 	HelpMenu = fyne.NewMenu(ML(MLTHelp), documentation, projectAddress, newVersion, contactTheAuthor)
 	RegisterTranslatable(MLTHelp, HelpMenu)
 
-	FileMenu = fyne.NewMenu(ML(MLTFile), newItem)
+	FileMenu = fyne.NewMenu(ML(MLTFile), downloadItem, uploadItem, memoItem, importMemoItem)
 	RegisterTranslatable(MLTFile, FileMenu)
 
 	device := fyne.CurrentDevice()

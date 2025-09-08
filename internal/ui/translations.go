@@ -66,6 +66,11 @@ const (
 	MLTProjectAddress         = "MLTProjectAddress"         // 项目地址
 	MLTNewVersion             = "MLTNewVersion"             // 新版本
 	MLTContactTheAuthor       = "MLTContactTheAuthor"       // 联系作者
+	MLUploadDir               = "MLUploadDir"               // 接收上传目录
+	MLSpecifyUploadDir        = "MLSpecifyUploadDir"        // 指定接收上传目录
+	MLUploadDirNow            = "MLUploadDirNow"            // 接收目录 %s
+	MLUploadQrTip             = "MLUploadQrTip"             // 移动设备在同一WiFi内扫码上传
+	MLUploadNotDir            = "MLUploadNotDir"            // 选择目录接收上传文件
 )
 
 // 1. 翻译映射表
@@ -127,6 +132,11 @@ var translations = map[string]map[string]string{
 		MLTProjectAddress:         "Project Address",
 		MLTNewVersion:             "New Version",
 		MLTContactTheAuthor:       "Contact The Author",
+		MLUploadDir:               "Receive Upload Directory",
+		MLSpecifyUploadDir:        "Specify Upload Dir",
+		MLUploadDirNow:            "Receiving directory: %s",
+		MLUploadQrTip:             "Scan and upload codes on mobile devices within the same WiFi",
+		MLUploadNotDir:            "Select directory to receive uploaded files",
 	},
 	"zh-CN": {
 		MLTAppTitle:               "TFLanHttpDesktop 内网传输工具",
@@ -185,6 +195,11 @@ var translations = map[string]map[string]string{
 		MLTProjectAddress:         "项目地址",
 		MLTNewVersion:             "新版本",
 		MLTContactTheAuthor:       "联系作者",
+		MLUploadDir:               "接收上传目录",
+		MLSpecifyUploadDir:        "指定接收上传目录",
+		MLUploadDirNow:            "接收目录: %s",
+		MLUploadQrTip:             "移动设备在同一WiFi内扫码上传",
+		MLUploadNotDir:            "选择目录接收上传文件",
 	},
 }
 
