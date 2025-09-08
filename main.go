@@ -11,6 +11,8 @@ import (
 	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/widget"
 	"github.com/gin-gonic/gin"
 	"io"
 	"net"
@@ -68,6 +70,10 @@ func main() {
 	ui.MainWindow.SetMainMenu(ui.MakeMenu())
 	ui.MainWindow.SetMaster()
 	ui.MainWindow.SetContent(ui.MainContent())
+
+	notice := widget.NewRichTextFromMarkdown(ui.MLGet(ui.MLWelcomeContent))
+	notice.Segments[2].(*widget.HyperlinkSegment).Alignment = fyne.TextAlignCenter
+	dialog.ShowCustom(ui.MLGet(ui.MLWelcome), "OK", notice, ui.MainWindow)
 
 	ui.MainWindow.ShowAndRun()
 }

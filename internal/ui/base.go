@@ -51,7 +51,7 @@ func MakeTray(a fyne.App) {
 			//}
 		}
 
-		domain := fyne.NewMenuItem("项目网站", func() {
+		domain := fyne.NewMenuItem("项目地址", func() {
 		})
 		domain.Action = func() {
 			u, _ := url.Parse("https://github.com/mangenotwork/TFLanHttpDesktop")
@@ -62,9 +62,6 @@ func MakeTray(a fyne.App) {
 			"TFLanHttpDesktop", // 菜单名称（桌面平台显示用）
 			menuItem,           // 第一个菜单项
 			domain,             // 第二个菜单项
-			// 可继续添加更多菜单项...
-			// todo... 浏览器打开下载
-			// todo... 浏览器打开上传
 		)
 		desk.SetSystemTrayMenu(trayMenu)
 	}
@@ -79,7 +76,7 @@ func MainContent() *container.Split {
 	UploadContainerShow()
 
 	MemoEntry.OnChanged = func(val string) {
-		logger.Debug(val)
+		//logger.Debug(val)
 		_, err := data.SetMemoContent(NowMemoId, val)
 		if err != nil {
 			logger.Error(err)

@@ -61,7 +61,7 @@ func UploadContainerShow() {
 
 	uploadCopy := &widget.Button{
 		Text: ML(MLTCopy),
-		//Icon: theme.NavigateNextIcon(),
+		Icon: theme.ContentCopyIcon(),
 		OnTapped: func() {
 			logger.Debug("复制上传链接")
 			UploadCopyUrlEvent(uploadUrl)
@@ -81,7 +81,7 @@ func UploadContainerShow() {
 
 	delBtn := &widget.Button{
 		Text: ML(MLTDel),
-		//Icon: theme.NavigateNextIcon(),
+		Icon: theme.DeleteIcon(),
 		OnTapped: func() {
 			logger.Debug("删除上传")
 			UploadDelEvent()
@@ -91,7 +91,7 @@ func UploadContainerShow() {
 
 	pwdBtn := &widget.Button{
 		Text: ML(MLTSetPassword),
-		//Icon: theme.NavigateNextIcon(),
+		Icon: theme.VisibilityOffIcon(),
 		OnTapped: func() {
 			logger.Debug("密码管理")
 			UploadPasswordEvent(uploadData.Password)
@@ -101,7 +101,7 @@ func UploadContainerShow() {
 
 	logBtn := &widget.Button{
 		Text: ML(MLTLog),
-		//Icon: theme.NavigateNextIcon(),
+		Icon: theme.ContentPasteIcon(),
 		OnTapped: func() {
 			logger.Debug("接收日志")
 			UploadLogEvent()

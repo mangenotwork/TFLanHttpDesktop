@@ -5,6 +5,7 @@ const (
 	DBFileFileName   = "data.db"
 	FcDBFileFileName = "fc.db"
 	CiDBFileFileName = "ci.db"
+	Version          = "v0.1"
 )
 
 var (

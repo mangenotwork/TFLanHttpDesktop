@@ -13,7 +13,7 @@ import (
 )
 
 func UploadEvent() {
-	dialog.ShowFolderOpen(func(list fyne.ListableURI, err error) {
+	fd := dialog.NewFolderOpen(func(list fyne.ListableURI, err error) {
 		if err != nil {
 			dialog.ShowError(err, MainWindow)
 			return
@@ -61,6 +61,8 @@ func UploadEvent() {
 		)
 
 	}, MainWindow)
+	fd.Resize(fyne.NewSize(960, 700))
+	fd.Show()
 }
 
 func UploadCopyUrlEvent(url string) {
@@ -133,6 +135,6 @@ func UploadLogEvent() {
 		content.Add(widget.NewLabel(fmt.Sprintf("%s | %s| %s| %s | %s", v.Time, v.Path, v.Files, v.IP, v.UserAgent)))
 	}
 	downloadDialog := dialog.NewCustom("上传日志", "关闭", container.NewScroll(content), MainWindow)
-	downloadDialog.Resize(fyne.NewSize(500, 600))
+	downloadDialog.Resize(fyne.NewSize(1400, 700))
 	downloadDialog.Show()
 }

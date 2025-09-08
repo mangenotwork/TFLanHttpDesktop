@@ -50,7 +50,7 @@ func DownloadEvent() {
 		NowDownloadFilePath = reader.URI().Path()
 		DownloadContainerShow()
 	}, MainWindow)
-	fd.Resize(fyne.NewSize(900, 600))
+	fd.Resize(fyne.NewSize(960, 700))
 	fd.Show()
 }
 

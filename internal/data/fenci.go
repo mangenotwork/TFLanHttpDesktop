@@ -87,7 +87,7 @@ func GetMemoFenCiList(memoId, content string) error {
 	for _, v := range oldFenCi {
 		oldFenCiMap[v.Ci] = v.WordFrequency
 	}
-	logger.Debug("oldFenCiMap = ", oldFenCiMap)
+	//logger.Debug("oldFenCiMap = ", oldFenCiMap)
 
 	memoFc := make(MemoFenCiList)
 	fcList := TermExtract(content)
@@ -98,11 +98,11 @@ func GetMemoFenCiList(memoId, content string) error {
 			memoFc[v.Text]++
 		}
 	}
-	logger.Debug("memoFc = ", memoFc)
+	//logger.Debug("memoFc = ", memoFc)
 
 	// 删除
 	delFcList := oldFenCiMap.ANotB(memoFc)
-	logger.Debug("delFcList = ", delFcList)
+	//logger.Debug("delFcList = ", delFcList)
 	for k, _ := range delFcList {
 		fc1, err := GetCiList(k)
 		if err != nil && !errors.Is(ISNULL, err) {
@@ -122,7 +122,7 @@ func GetMemoFenCiList(memoId, content string) error {
 
 	// 新增
 	addFcList := memoFc.ANotB(oldFenCiMap)
-	logger.Debug("addFcList = ", addFcList)
+	//logger.Debug("addFcList = ", addFcList)
 	for k, v := range addFcList {
 		fc1, err := GetCiList(k)
 		if err != nil && !errors.Is(ISNULL, err) {

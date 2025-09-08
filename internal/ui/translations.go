@@ -71,6 +71,9 @@ const (
 	MLUploadDirNow            = "MLUploadDirNow"            // 接收目录 %s
 	MLUploadQrTip             = "MLUploadQrTip"             // 移动设备在同一WiFi内扫码上传
 	MLUploadNotDir            = "MLUploadNotDir"            // 选择目录接收上传文件
+	MLWelcome                 = "MLWelcome"                 // 欢迎
+	MLWelcomeContent          = "MLWelcomeContent"          // 欢迎内容
+	MLTAboutContent           = "MLTAboutContent"           // 关于
 )
 
 // 1. 翻译映射表
@@ -137,6 +140,9 @@ var translations = map[string]map[string]string{
 		MLUploadDirNow:            "Receiving directory: %s",
 		MLUploadQrTip:             "Scan and upload codes on mobile devices within the same WiFi",
 		MLUploadNotDir:            "Select directory to receive uploaded files",
+		MLWelcome:                 "Welcome to use TFLanHttpDesktop", // 欢迎
+		MLWelcomeContent:          "Transfer Files from LAN Http Desktop, This application will start an HTTP service to transfer files through the HTTP protocol.\n\n[TFLanHttpDesktop on GitHub](https://github.com/mangenotwork/TFLanHttpDesktop)",
+		MLTAboutContent:           "TFLanHttpDesktop 版本：%s\nTransfer Files from LAN Http Desktop, 用于局域网内指定文件生成二维码或链接提供给三方设备用局域网http协议下载文件，三方设备也可以上传文件，桌面应用程序，跨平台。\n开源项目: https://github.com/mangenotwork/TFLanHttpDesktop\n\n",
 	},
 	"zh-CN": {
 		MLTAppTitle:               "TFLanHttpDesktop 内网传输工具",
@@ -200,6 +206,9 @@ var translations = map[string]map[string]string{
 		MLUploadDirNow:            "接收目录: %s",
 		MLUploadQrTip:             "移动设备在同一WiFi内扫码上传",
 		MLUploadNotDir:            "选择目录接收上传文件",
+		MLWelcome:                 "欢迎使用TFLanHttpDesktop", // 欢迎
+		MLWelcomeContent:          "该应用会启动一个http服务，通过http协议进行传输文件\n\n[TFLanHttpDesktop on GitHub](https://github.com/mangenotwork/TFLanHttpDesktop)",
+		MLTAboutContent:           "TFLanHttpDesktop 版本：%s\nTransfer Files from LAN Http Desktop, 用于局域网内指定文件生成二维码或链接提供给三方设备用局域网http协议下载文件，三方设备也可以上传文件，桌面应用程序，跨平台。\n开源项目: https://github.com/mangenotwork/TFLanHttpDesktop\n\n",
 	},
 }
 

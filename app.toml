@@ -2,7 +2,7 @@
 Icon = "icon.png"
 Name = "TFLanHttpDesktop"
 ID = "TFLanHttpDesktop.2025.0826"
-Version = "0.0.1"
+Version = "0.1.1"
 Build = 1
 
 [Migrations]
@@ -21,5 +21,5 @@ HelperText = "This binary was built without debug symbols"
 [LinuxAndBSD]
 GenericName = "TFLanHttpDesktop"
 Categories = ["Development"]
-Comment = "TFLanHttpDesktop About Transfer Files from LAN Http Desktop, 用于局域网内指定文件生成二维码或链接提供给三方设备用局域网http协议下载文件，三方设备也可以上传文件，桌面应用程序，跨平台"
+Comment = "Transfer Files from LAN Http Desktop, 生成二维码或链接提供给局域网内的三方设备下载指定文件和上传文件，桌面应用程序，跨平台，绿色免安装"
 Keywords = ["TFLanHttpDesktop", "fyne"]

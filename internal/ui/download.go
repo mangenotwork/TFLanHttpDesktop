@@ -12,6 +12,7 @@ import (
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
+	"path"
 )
 
 // DownloadContainer 下载组件
@@ -23,12 +24,13 @@ var NowDownloadFilePath = ""
 func DownloadContainerShow() {
 	downloadData, _ := data.GetDownloadData()
 	DownloadContainer.RemoveAll()
-	DownloadTitle := canvas.NewText(ML(MLTDownloadTitle, NowDownloadFilePath), nil)
-	RegisterTranslatable(MLTDownloadTitle, DownloadTitle, NowDownloadFilePath)
+	_, fName := path.Split(NowDownloadFilePath)
+	DownloadTitle := canvas.NewText(ML(MLTDownloadTitle, fName), nil)
+	RegisterTranslatable(MLTDownloadTitle, DownloadTitle, fName)
 	DownloadTitle.TextStyle = fyne.TextStyle{
 		Bold: true,
 	}
-	DownloadTitle.TextSize = 14
+	DownloadTitle.TextSize = 16
 	DownloadTitleContainer := container.NewCenter(DownloadTitle)
 	DownloadContainer.Add(layout.NewSpacer())
 	downloadUrl := ""
@@ -67,7 +69,7 @@ func DownloadContainerShow() {
 	// 复制按钮
 	downloadCopyBtn := &widget.Button{
 		Text: ML(MLTCopy),
-		//Icon: theme.NavigateNextIcon(),
+		Icon: theme.ContentCopyIcon(),
 		OnTapped: func() {
 			DownloadCopyUrlEvent(downloadUrl)
 		},
@@ -77,7 +79,7 @@ func DownloadContainerShow() {
 	// 删除按钮
 	downloadDelBtn := &widget.Button{
 		Text: ML(MLTDel),
-		//Icon: theme.NavigateNextIcon(),
+		Icon: theme.DeleteIcon(),
 		OnTapped: func() {
 			DownloadDelEvent()
 		},
@@ -87,7 +89,7 @@ func DownloadContainerShow() {
 	// 设置密码
 	setPasswordBtn := &widget.Button{
 		Text: ML(MLTSetPassword),
-		//Icon: theme.NavigateNextIcon(),
+		Icon: theme.VisibilityOffIcon(),
 		OnTapped: func() {
 			DownloadPasswordEvent(downloadData.Password)
 		},
@@ -96,7 +98,7 @@ func DownloadContainerShow() {
 
 	logBtn := &widget.Button{
 		Text: ML(MLTLog),
-		//Icon: theme.NavigateNextIcon(),
+		Icon: theme.ContentPasteIcon(),
 		OnTapped: func() {
 			DownloadLogEvent()
 		},

@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"TFLanHttpDesktop/common/define"
 	"TFLanHttpDesktop/common/logger"
 	"TFLanHttpDesktop/internal/data"
 	"fmt"
@@ -33,13 +34,15 @@ func MakeMenu() *fyne.MainMenu {
 		for _, v := range logList {
 			content.Add(widget.NewLabel(fmt.Sprintf("%s | %s", v.Time, v.Event)))
 		}
-		downloadDialog := dialog.NewCustom("下载日志", "关闭", container.NewScroll(content), MainWindow)
-		downloadDialog.Resize(fyne.NewSize(500, 600))
+		downloadDialog := dialog.NewCustom("系统日志", "关闭", container.NewScroll(content), MainWindow)
+		downloadDialog.Resize(fyne.NewSize(1400, 700))
 		downloadDialog.Show()
 	}
 	showAbout := func() {
 		w := MainApp.NewWindow(MLGet(MLTAbout))
-		w.SetContent(widget.NewLabel("TFLanHttpDesktop\nTransfer Files from LAN Http Desktop, 用于局域网内指定文件生成二维码或链接提供给三方设备用局域网http协议下载文件，三方设备也可以上传文件，桌面应用程序，跨平台。"))
+		w.SetContent(widget.NewLabel(
+			fmt.Sprintf(MLGet(MLTAboutContent, define.Version)),
+		))
 		w.Show()
 	}
 
@@ -70,6 +73,7 @@ func MakeMenu() *fyne.MainMenu {
 	importMemoItem := fyne.NewMenuItem(ML(MLTImportTxtBtn), func() {
 		ImportTxtEvent()
 	})
+	importMemoItem.Icon = theme.FolderOpenIcon()
 	RegisterTranslatable(MLTImportTxtBtn, importMemoItem)
 
 	aboutItem := fyne.NewMenuItem(ML(MLTAbout), showAbout)

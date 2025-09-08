@@ -162,6 +162,7 @@ func ImportTxtEvent() {
 
 	}, MainWindow)
 	fd.SetFilter(storage.NewExtensionFileFilter([]string{".txt"}))
+	fd.Resize(fyne.NewSize(960, 700))
 	fd.Show()
 }
 
@@ -254,5 +255,6 @@ func MemoSaveToTxt() {
 	fd.SetFilter(storage.NewExtensionFileFilter([]string{".txt"}))
 	fd.SetFileName(memoData.Name + ".txt")
 	fd.SetTitleText("另存为txt")
+	fd.Resize(fyne.NewSize(960, 700))
 	fd.Show()
 }

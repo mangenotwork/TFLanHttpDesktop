@@ -83,16 +83,22 @@ func MemoShow() {
 	}
 	RegisterTranslatable(MLTImportTxtBtn, importTxtBtn)
 
+	refreshBtn := &widget.Button{
+		Text: ML(MLTRefresh),
+		Icon: theme.ViewRefreshIcon(),
+		OnTapped: func() {
+			MemoListShow()
+			d := dialog.NewInformation(MLGet(MLTDialogTipTitle), MLGet(MLTRefreshSuccess), MainWindow)
+			d.Resize(fyne.NewSize(260, 120))
+			d.Show()
+		},
+	}
+	RegisterTranslatable(MLTRefresh, refreshBtn)
+
 	ListContainerTop.Add(container.NewHBox(
 		addMemoBtn,
 		importTxtBtn,
-		&widget.Button{
-			Icon: theme.ViewRefreshIcon(),
-			OnTapped: func() {
-				MemoListShow()
-				dialog.ShowInformation(MLGet(MLTDialogTipTitle), MLGet(MLTRefreshSuccess), MainWindow)
-			},
-		},
+		refreshBtn,
 		layout.NewSpacer(),
 	))
 	ListContainerTop.Add(NewSearchBox())
@@ -120,7 +126,7 @@ func MemoEntryContainerShow(id string) {
 
 	refreshBtn := &widget.Button{
 		Text: ML(MLTRefresh),
-		//Icon: theme.NavigateNextIcon(),
+		Icon: theme.ViewRefreshIcon(),
 		OnTapped: func() {
 			newContent, newContentErr := data.GetMemoContent(NowMemoId)
 			if newContentErr != nil {
@@ -129,14 +135,16 @@ func MemoEntryContainerShow(id string) {
 			}
 			MemoEntry.SetText(newContent.String())
 			MemoEntry.Refresh()
-			dialog.ShowInformation(MLGet(MLTDialogTipTitle), MLGet(MLTRefreshSuccess), MainWindow)
+			d := dialog.NewInformation(MLGet(MLTDialogTipTitle), MLGet(MLTRefreshSuccess), MainWindow)
+			d.Resize(fyne.NewSize(260, 120))
+			d.Show()
 		},
 	}
 	RegisterTranslatable(MLTRefresh, refreshBtn)
 
 	copyBtn := &widget.Button{
 		Text: ML(MLTCopy),
-		//Icon: theme.NavigateNextIcon(),
+		Icon: theme.ContentCopyIcon(),
 		OnTapped: func() {
 			CopyMemoEvent(memoUrl)
 		},
@@ -145,6 +153,7 @@ func MemoEntryContainerShow(id string) {
 
 	openQrBtn := &widget.Button{
 		Text: ML(MLTOpenQr),
+		Icon: theme.ViewFullScreenIcon(),
 		OnTapped: func() {
 			OpenMemoEvent(memoUrl)
 		},
@@ -153,7 +162,7 @@ func MemoEntryContainerShow(id string) {
 
 	delBtn := &widget.Button{
 		Text: ML(MLTDel),
-		//Icon: theme.NavigateNextIcon(),
+		Icon: theme.DeleteIcon(),
 		OnTapped: func() {
 			DelMemoEvent()
 		},
@@ -162,7 +171,7 @@ func MemoEntryContainerShow(id string) {
 
 	editPropertiesBtn := &widget.Button{
 		Text: ML(MLTEditProperties),
-		//Icon: theme.NavigateNextIcon(),
+		Icon: theme.DocumentCreateIcon(),
 		OnTapped: func() {
 			NewMemoEvent(true, NowMemoId)
 		},
@@ -171,7 +180,7 @@ func MemoEntryContainerShow(id string) {
 
 	saveAsTxtBtn := &widget.Button{
 		Text: ML(MLTSaveAsTxt),
-		//Icon: theme.NavigateNextIcon(),
+		Icon: theme.DownloadIcon(),
 		OnTapped: func() {
 			MemoSaveToTxt()
 		},

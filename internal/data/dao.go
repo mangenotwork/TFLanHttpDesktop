@@ -51,7 +51,9 @@ func GetDownloadLog() ([]*DownloadLog, error) {
 	limit := 1000
 	result := make([]*DownloadLog, 0)
 	db := DB.GetDB()
-	defer db.Close()
+	defer func() {
+		_ = db.Close()
+	}()
 	err := db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(DownloadLogTable))
 		if bucket == nil {
@@ -90,7 +92,9 @@ func GetUploadLog() ([]*UploadLog, error) {
 	limit := 1000
 	result := make([]*UploadLog, 0)
 	db := DB.GetDB()
-	defer db.Close()
+	defer func() {
+		_ = db.Close()
+	}()
 	err := db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(UploadLogTable))
 		if bucket == nil {
@@ -168,17 +172,12 @@ func NewMemo(name string, authority int, password string) (*Memo, error) {
 func GetMemoContent(id string) (MemoContent, error) {
 	var content MemoContent = ""
 	err := DB.Get(MemoContentTable, id, &content)
-
-	logger.Debug("[GetMemoContent] id = ", id, " | content = ", content)
-
 	return content, err
 }
 
 // SetMemoContent 修改备忘录内容
 func SetMemoContent(id string, content string) (MemoContent, error) {
-	logger.Debug("[SetMemoContent] id = ", id, " | content = ", content)
 	err := DB.Set(MemoContentTable, id, content)
-
 	now := time.Now()
 	t := now.Sub(MemoEntryTime).Seconds()
 	if t > 0.02 {
@@ -248,7 +247,9 @@ func GetOperationLog() ([]*OperationLog, error) {
 	limit := 1000
 	result := make([]*OperationLog, 0)
 	db := DB.GetDB()
-	defer db.Close()
+	defer func() {
+		_ = db.Close()
+	}()
 	err := db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(OperationLogTable))
 		if bucket == nil {
