@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -41,6 +42,7 @@ type LocalDB struct {
 	Path   string
 	Tables []string
 	Conn   *bolt.DB
+	dbOnce sync.Once
 }
 
 func getDirName(filePath string) string {
@@ -80,22 +82,24 @@ func (ldb *LocalDB) Init() {
 
 	checkDBFile(ldb.Path)
 
-	db, err := bolt.Open(ldb.Path, 0600, nil)
-	if err != nil {
-		logger.Panic(err)
-	}
+	ldb.Open()
 
-	defer func() {
-		_ = db.Close()
-	}()
+	//db, err := bolt.Open(ldb.Path, 0600, nil)
+	//if err != nil {
+	//	logger.Panic(err)
+	//}
+
+	//defer func() {
+	//	_ = db.Close()
+	//}()
 
 	for _, table := range ldb.Tables {
 
-		err = db.Update(func(tx *bolt.Tx) error {
+		err := ldb.Conn.Update(func(tx *bolt.Tx) error {
 			b := tx.Bucket([]byte(table))
 
 			if b == nil {
-				_, err = tx.CreateBucket([]byte(table))
+				_, err := tx.CreateBucket([]byte(table))
 				if err != nil {
 					logger.Panic(err)
 				}
@@ -137,23 +141,24 @@ func InitDB(dbPath, fcPath, ciPath string) {
 }
 
 func (ldb *LocalDB) Open() {
-	var err error
-	maxRetries := 4
-	for i := 0; i < maxRetries; i++ {
+	ldb.dbOnce.Do(func() {
+		var err error
 		ldb.Conn, err = bolt.Open(ldb.Path, 0600, &bolt.Options{
 			Timeout: 5 * time.Second, // 设置超时时间，避免永久阻塞
 		})
-		if err == nil {
-			break
+		if err != nil {
+			logger.Error(err)
 		}
-		time.Sleep(40 * time.Millisecond)
-	}
+	})
 }
 
 func (ldb *LocalDB) Close() {
-	if ldb.Conn != nil {
-		_ = ldb.Conn.Close()
-	}
+	//if ldb.Conn != nil {
+	//	err := ldb.Conn.Close()
+	//	if err != nil {
+	//		logger.Error(err)
+	//	}
+	//}
 }
 
 func (ldb *LocalDB) GetDB() *bolt.DB {
@@ -163,9 +168,9 @@ func (ldb *LocalDB) GetDB() *bolt.DB {
 
 func (ldb *LocalDB) ClearTable(table string) error {
 	ldb.Open()
-	defer func() {
-		_ = ldb.Conn.Close()
-	}()
+	//defer func() {
+	//	_ = ldb.Conn.Close()
+	//}()
 	return ldb.Conn.Update(func(tx *bolt.Tx) error {
 		return tx.DeleteBucket([]byte(table))
 	})
@@ -177,11 +182,11 @@ func (ldb *LocalDB) Stats(table string) (bolt.BucketStats, error) {
 
 	ldb.Open()
 
-	defer func() {
-		if ldb.Conn != nil {
-			_ = ldb.Conn.Close()
-		}
-	}()
+	//defer func() {
+	//	if ldb.Conn != nil {
+	//		_ = ldb.Conn.Close()
+	//	}
+	//}()
 
 	err := ldb.Conn.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(table))
@@ -203,11 +208,7 @@ func (ldb *LocalDB) Stats(table string) (bolt.BucketStats, error) {
 func (ldb *LocalDB) Get(table, key string, data interface{}) error {
 
 	ldb.Open()
-	defer func() {
-		if ldb.Conn != nil {
-			_ = ldb.Conn.Close()
-		}
-	}()
+	//defer ldb.Close()
 
 	return ldb.Conn.View(func(tx *bolt.Tx) error {
 
@@ -239,11 +240,11 @@ func (ldb *LocalDB) Set(table, key string, data interface{}) error {
 
 	ldb.Open()
 
-	defer func() {
-		if ldb.Conn != nil {
-			_ = ldb.Conn.Close()
-		}
-	}()
+	//defer func() {
+	//	if ldb.Conn != nil {
+	//		_ = ldb.Conn.Close()
+	//	}
+	//}()
 
 	if ldb.Conn == nil {
 		logger.Error("未取到本地数据连接")
@@ -275,11 +276,11 @@ func (ldb *LocalDB) Set(table, key string, data interface{}) error {
 func (ldb *LocalDB) Delete(table, key string) error {
 	ldb.Open()
 
-	defer func() {
-		if ldb.Conn != nil {
-			_ = ldb.Conn.Close()
-		}
-	}()
+	//defer func() {
+	//	if ldb.Conn != nil {
+	//		_ = ldb.Conn.Close()
+	//	}
+	//}()
 
 	return ldb.Conn.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(table))
@@ -298,11 +299,11 @@ func (ldb *LocalDB) AllKey(table string) ([]string, error) {
 
 	ldb.Open()
 
-	defer func() {
-		if ldb.Conn != nil {
-			_ = ldb.Conn.Close()
-		}
-	}()
+	//defer func() {
+	//	if ldb.Conn != nil {
+	//		_ = ldb.Conn.Close()
+	//	}
+	//}()
 
 	err := ldb.Conn.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(table))
@@ -323,11 +324,11 @@ func (ldb *LocalDB) AllKey(table string) ([]string, error) {
 func (ldb *LocalDB) GetAll(table string, f func(k, v []byte)) error {
 	ldb.Open()
 
-	defer func() {
-		if ldb.Conn != nil {
-			_ = ldb.Conn.Close()
-		}
-	}()
+	//defer func() {
+	//	if ldb.Conn != nil {
+	//		_ = ldb.Conn.Close()
+	//	}
+	//}()
 
 	err := ldb.Conn.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(table))

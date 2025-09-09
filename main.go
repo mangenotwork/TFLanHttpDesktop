@@ -66,6 +66,9 @@ func main() {
 	ui.MakeTray(ui.MainApp)
 	ui.InitBus()
 
+	// 应用自定义主题（使用嵌入的字体）
+	ui.MainApp.Settings().SetTheme(newEmbeddedFontTheme())
+
 	ui.MainWindow.Resize(fyne.NewSize(1600, 900))
 	ui.MainWindow.SetMainMenu(ui.MakeMenu())
 	ui.MainWindow.SetMaster()

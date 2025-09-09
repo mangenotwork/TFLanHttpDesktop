@@ -43,7 +43,9 @@ func RunMq() {
 					if err != nil {
 						logger.Error(err)
 					} else {
-						ui.MemoEntry.SetText(newContent.String())
+						fyne.Do(func() {
+							ui.MemoEntry.SetText(newContent.String())
+						})
 					}
 
 				}
