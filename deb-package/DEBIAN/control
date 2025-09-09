@@ -1,0 +1,11 @@
+Package: TFLanHttpDesktop
+Version: 1.0.0
+Section: base
+Priority: optional
+Architecture: amd64
+Depends: libgl1, libx11-6, libxrandr2, libxcursor1, libxi6, libxinerama1
+Maintainer: Your Name <you@example.com>
+Description: A short description of your awesome Fyne app.
+ This is a more detailed description that can span multiple lines.
+ Each new line must start with a space.
+
