@@ -40,10 +40,36 @@ v0.5 新需求,待续...
 - [优化]备忘录大文本会卡,方案是最多1w字,限制大文本
 - [优化]备忘录正文需要有个标题
 - [优化]关于能link到项目地址
+- [新需求]还是需要有个分享的短链，因为复制的链接是md5编码，远程设备输入太复杂
 
 ## fyne 2.6 局限性
 - 弹出层的聚焦会夺去输入框的聚焦，无法做到输入弹出联动框
 - 底层私有了语言，外部无法直接操作选择语言，语言跟系统一致
 - dialog createInformationDialog 私有，无法做到更灵活的定制化
 - 系统托盘无法将缩小进行打开
-- 
+- github.com/go-gl/gl go mod 依赖不兼容导致拉包失败
+- 新老版本方法差距太大，市面上资料和文档老版本偏多
+- windows上交叉编译linux,darwin环境不好搭建
+
+## build
+export GOOS=windows
+export GOARCH=amd64
+export CGO_ENABLED=1
+/d/go/bin/fyne.exe package -os windows -icon ./icon.png -app-id "TFLanHttpDesktop.2025.0826" -app-version 0.1.1
+CertUtil -hashfile "TFLanHttpDesktop-v0.1.1-windows-arm64.zip" SHA256
+TFLanHttpDesktop-v0.1.1-windows-amd64.zip.sha256
+
+
+export GOOS=linux
+export GOARCH=amd64
+export CGO_ENABLED=1
+/d/go/bin/fyne.exe package -os linux -icon ./icon.png -app-id TFLanHttpDesktop.2025.0826 -app-version 0.1.1
+
+set GOARCH=arm64
+/d/go/bin/fyne.exe package -os windows -icon ./icon.png -app-id TFLanHttpDesktop.2025.0826 -app-version 0.1.1
+/d/go/bin/fyne.exe package -os linux -icon ./icon.png -app-id TFLanHttpDesktop.2025.0826 -app-version 0.1.1
+TFLanHttpDesktop-v0.1.1-windows-arm64.zip TFLanHttpDesktop-v0.1.1-windows-arm64.zip.sha256
+
+需要在苹果系统上打包
+fyne package -os darwin -icon ./icon.png -app-id TFLanHttpDesktop.2025.0826 -app-version 0.1.1
+fyne package -os darwin -icon ./icon.png -app-id TFLanHttpDesktop.2025.0826 -app-version 0.1.1
