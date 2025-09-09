@@ -41,6 +41,8 @@ v0.5 新需求,待续...
 - [优化]备忘录正文需要有个标题
 - [优化]关于能link到项目地址
 - [新需求]还是需要有个分享的短链，因为复制的链接是md5编码，远程设备输入太复杂
+- [兼容bug]linux 上中文乱码
+- [打包] 编译deb图标不显示
 
 ## fyne 2.6 局限性
 - 弹出层的聚焦会夺去输入框的聚焦，无法做到输入弹出联动框
@@ -56,7 +58,7 @@ export GOOS=windows
 export GOARCH=amd64
 export CGO_ENABLED=1
 /d/go/bin/fyne.exe package -os windows -icon ./icon.png -app-id "TFLanHttpDesktop.2025.0826" -app-version 0.1.1
-CertUtil -hashfile "TFLanHttpDesktop-v0.1.1-windows-arm64.zip" SHA256
+CertUtil -hashfile "TFLanHttpDesktop-v0.1.1-linux-amd64.tar.xz" SHA256
 TFLanHttpDesktop-v0.1.1-windows-amd64.zip.sha256
 
 
@@ -73,3 +75,63 @@ TFLanHttpDesktop-v0.1.1-windows-arm64.zip TFLanHttpDesktop-v0.1.1-windows-arm64.
 需要在苹果系统上打包
 fyne package -os darwin -icon ./icon.png -app-id TFLanHttpDesktop.2025.0826 -app-version 0.1.1
 fyne package -os darwin -icon ./icon.png -app-id TFLanHttpDesktop.2025.0826 -app-version 0.1.1
+
+## 编译deb
+
+1.
+​​创建打包目录结构​​
+
+在你的项目目录外，创建一个用于打包的临时文件夹（例如 deb-package），并建立符合 Debian 标准的子目录：
+
+mkdir -p deb-package/DEBIAN
+mkdir -p deb-package/usr/local/bin
+mkdir -p deb-package/usr/share/applications
+mkdir -p deb-package/usr/share/icons/hicolor/256x256/apps
+•
+将之前编译好的 Fyne 可执行文件 your-app-name复制到 deb-package/usr/local/bin/目录下。
+
+•
+准备一个 256x256 像素的 PNG 图标（如 myapp.png），复制到 deb-package/usr/share/icons/hicolor/256x256/apps/目录下。
+
+
+
+2.
+​​创建 DEBIAN/control 文件​​
+
+这是软件包的核心元数据文件，告诉包管理器关于这个软件的信息。
+
+touch deb-package/DEBIAN/control
+用文本编辑器编辑 deb-package/DEBIAN/control文件，内容参考如下：
+
+Package: your-app-name
+Version: 1.0.0
+Section: base
+Priority: optional
+Architecture: amd64
+Depends: libgl1, libx11-6, libxrandr2, libxcursor1, libxi6, libxinerama1 # Fyne 运行所需的一些基础图形库依赖
+Maintainer: Your Name <you@example.com>
+Description: A short description of your awesome Fyne app.
+This is a more detailed description that can span multiple lines.
+Each new line must start with a space.
+3.
+​​（可选）创建桌面菜单项 .desktop 文件​​
+
+为了让你的应用出现在系统应用菜单中，创建 deb-package/usr/share/applications/your-app-name.desktop：
+
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Your App Name
+Comment=A short comment about your app
+Exec=/usr/local/bin/your-app-name
+Icon=myapp # 注意这里不需要扩展名，指向你放在 icons 目录下的文件名
+Categories=Utility; # 参考 https://standards.freedesktop.org/menu-spec/latest/apa.html
+Terminal=false
+StartupWMClass=Your-App-Name
+4.
+​​构建 .deb 包​​
+
+在 deb-package的父目录下运行：
+
+dpkg-deb --build deb-package
+完成后会生成 deb-package.deb文件。你可以使用 dpkg -i deb-package.deb安装它
