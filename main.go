@@ -58,6 +58,8 @@ func main() {
 	ui.MainApp = app.NewWithID("TFLanHttpDesktop.2025.0826")
 	icon, _ := fyne.LoadResourceFromPath("./icon.png")
 	ui.MainApp.SetIcon(icon)
+	// 应用自定义主题（使用嵌入的字体）
+	ui.MainApp.Settings().SetTheme(newEmbeddedFontTheme())
 
 	ui.MainWindow = ui.MainApp.NewWindow(ui.ML(ui.MLTAppTitle))
 	logger.Debug("初始化UI")
@@ -65,9 +67,6 @@ func main() {
 	ui.LogLifecycle(ui.MainApp)
 	ui.MakeTray(ui.MainApp)
 	ui.InitBus()
-
-	// 应用自定义主题（使用嵌入的字体）
-	ui.MainApp.Settings().SetTheme(newEmbeddedFontTheme())
 
 	ui.MainWindow.Resize(fyne.NewSize(1600, 900))
 	ui.MainWindow.SetMainMenu(ui.MakeMenu())

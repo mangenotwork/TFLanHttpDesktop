@@ -50,6 +50,8 @@ v0.5 新需求,待续...
 - github.com/go-gl/gl go mod 依赖不兼容导致拉包失败
 - 新老版本方法差距太大，市面上资料和文档老版本偏多
 - windows上交叉编译linux,darwin环境不好搭建
+- linux普通用户扫不到系统的中文字体文件，或者根本就没有中文字体
+- 
 
 ## build
 export GOOS=windows

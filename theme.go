@@ -20,7 +20,7 @@ func (f *forcedVariant) Color(name fyne.ThemeColorName, _ fyne.ThemeVariant) col
 // 嵌入字体文件（//go:embed 指令必须放在变量定义前，且路径相对于当前文件）
 // 注意：fonts目录下的所有.ttf文件都会被嵌入
 //
-//go:embed fonts/*.ttf
+//go:embed fonts/NotoSans-Regular.ttf
 var fontFiles embed.FS
 
 // 自定义主题，使用嵌入的中文字体
@@ -38,9 +38,15 @@ func newEmbeddedFontTheme() *embeddedFontTheme {
 		return &embeddedFontTheme{baseTheme: theme.DefaultTheme()}
 	}
 
+	// 验证字体数据非空
+	if len(fontData) == 0 {
+		fyne.LogError("嵌入的字体文件为空", nil)
+		return &embeddedFontTheme{baseTheme: theme.DefaultTheme()}
+	}
+
 	return &embeddedFontTheme{
 		baseTheme: theme.DefaultTheme(),
-		fontRes:   fyne.NewStaticResource("embedded-chinese-font", fontData),
+		fontRes:   fyne.NewStaticResource("embedded-font", fontData),
 	}
 }
 
