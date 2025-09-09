@@ -177,11 +177,18 @@ func GetMemoContent(id string) (MemoContent, error) {
 
 // SetMemoContent 修改备忘录内容
 func SetMemoContent(id string, content string) (MemoContent, error) {
+
+	// 设计 最多1w字,限制大文本
+	if len([]rune(content)) > 10000 {
+		return "", fmt.Errorf("限制文本长度1万字符以内")
+	}
+
 	err := DB.Set(MemoContentTable, id, content)
 	go func() {
 		_ = GetMemoFenCiList(id, content)
 	}()
 
+	// 限制频繁计算分词
 	//now := time.Now()
 	//t := now.Sub(MemoEntryTime).Seconds()
 	//if t > 0.02 {

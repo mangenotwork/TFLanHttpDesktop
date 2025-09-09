@@ -23,6 +23,17 @@ func Health(ctx *gin.Context) {
 	return
 }
 
+func Share(ctx *gin.Context) {
+	id := ctx.Param("id")
+	idInt := utils.AnyToInt(id)
+	urlData, ok := define.ShareMap[idInt]
+	if !ok {
+		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("链接已失效"))
+		return
+	}
+	ctx.Redirect(http.StatusTemporaryRedirect, urlData)
+}
+
 func DebugDownloadPg(ctx *gin.Context) {
 	ctx.Data(http.StatusOK, "text/html; charset=utf-8", []byte(assets.DownloadPg))
 }
@@ -35,7 +46,7 @@ func DownloadPg(ctx *gin.Context) {
 	filePath, ok := define.DownloadMem[fileKey]
 	if !ok {
 		logger.Debug("file not found")
-		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("下载链接已失效"))
+		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("链接已失效"))
 		return
 	}
 	logger.Info(filePath)
@@ -43,7 +54,7 @@ func DownloadPg(ctx *gin.Context) {
 	downloadData, _ := data.GetDownloadData()
 	logger.Debug("downloadData = ", downloadData)
 	if downloadData.Path != filePath {
-		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("下载链接已失效"))
+		ctx.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte("链接已失效"))
 		return
 	}
 
@@ -404,8 +415,9 @@ func MemoSave(ctx *gin.Context) {
 	// 通知ui界面更新
 	ip, _ := ctx.Get(ReqIP)
 	mq.Producer(&mq.ChanData{
-		Type: 3,
-		Msg:  "三方设备修改了备忘录（ip: " + ip.(string) + "）: " + memoData.Name,
+		Type:   3,
+		MemoId: id,
+		Msg:    "三方设备修改了备忘录（ip: " + ip.(string) + "）: " + memoData.Name,
 	})
 
 	ctx.JSON(http.StatusOK, "上传成功")

@@ -23,3 +23,7 @@ const (
 	SignSaltLength = 16        // 随机盐值长度（字节）
 	SignExpiresIn  = 3600 * 24 // 签名有效期（秒），0表示永久有效
 )
+
+var ShareId = 0
+var ShareMap = make(map[int]string)
+var ShareHas = make(map[string]int)

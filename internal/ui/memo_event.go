@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"TFLanHttpDesktop/common/define"
 	"TFLanHttpDesktop/common/logger"
 	"TFLanHttpDesktop/common/utils"
 	"TFLanHttpDesktop/internal/data"
@@ -166,10 +167,24 @@ func ImportTxtEvent() {
 	fd.Show()
 }
 
-func CopyMemoEvent(memoUrl string) {
+func CopyMemoEvent(url string) {
+	if url == "" {
+		dialog.ShowError(fmt.Errorf("复制失败，链接为空"), MainWindow)
+		return
+	}
+
+	i, ok := define.ShareHas[url]
+	if !ok {
+		define.ShareId++
+		define.ShareHas[url] = define.ShareId
+		define.ShareMap[define.ShareId] = url
+		i = define.ShareId
+	}
+	url = fmt.Sprintf("%s/s/%d", define.DoMain, i)
+
 	clipboard := MainApp.Clipboard()
-	clipboard.SetContent(memoUrl)
-	dialog.ShowInformation(MLGet(MLTDialogTipTitle), MLGet(MLTDialogCopyLinkSuccess), MainWindow)
+	clipboard.SetContent(url)
+	DialogCopySuccess(url)
 }
 
 func OpenMemoEvent(memoUrl string) {

@@ -1,11 +1,8 @@
 Package: TFLanHttpDesktop
-Version: 1.0.0
+Version: 0.1.1
 Section: base
 Priority: optional
 Architecture: amd64
 Depends: libgl1, libx11-6, libxrandr2, libxcursor1, libxi6, libxinerama1
-Maintainer: Your Name <you@example.com>
-Description: A short description of your awesome Fyne app.
- This is a more detailed description that can span multiple lines.
- Each new line must start with a space.
-
+Maintainer: Man Li <2912882908@11.com>
+Description: Transfer Files from LAN Http Desktop, 用于局域网内指定文件生成二维码或链接提供给三方设备用局域网http协议下载文件，三方设备也可以上传文件，桌面应用程序，跨平台。开源项目: https://github.com/mangenotwork/TFLanHttpDesktop.

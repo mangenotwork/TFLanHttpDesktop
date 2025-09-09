@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=0.1.1
+Type=Application
+Name=TFLanHttpDesktop
+Comment=Transfer Files from LAN Http Desktop, 用于局域网内指定文件生成二维码或链接提供给三方设备用局域网http协议下载文件，三方设备也可以上传文件，桌面应用程序，跨平台。开源项目: https://github.com/mangenotwork/TFLanHttpDesktop.
+Exec=/usr/local/bin/TFLanHttpDesktop
+Icon=icon # 注意这里不需要扩展名，指向你放在 icons 目录下的文件名
+Categories=Utility; # 参考 https://standards.freedesktop.org/menu-spec/latest/apa.html
+Terminal=false
+StartupWMClass=TFLanHttpDesktop

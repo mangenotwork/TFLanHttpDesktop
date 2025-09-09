@@ -4,13 +4,15 @@ import (
 	"TFLanHttpDesktop/common/logger"
 	"TFLanHttpDesktop/common/utils"
 	"TFLanHttpDesktop/internal/data"
+	"TFLanHttpDesktop/internal/ui"
 	"fyne.io/fyne/v2"
 	"time"
 )
 
 type ChanData struct {
-	Type int // 1 上传 2 下载 3 更新备忘录
-	Msg  string
+	Type   int // 1 上传 2 下载 3 更新备忘录
+	Msg    string
+	MemoId string
 }
 
 var Chan = make(chan *ChanData)
@@ -35,6 +37,16 @@ func RunMq() {
 					Time:  time.Now().Format(utils.TimeTemplate),
 					Event: c.Msg,
 				})
+
+				if c.Type == 3 && ui.NowMemoId == c.MemoId {
+					newContent, err := data.GetMemoContent(c.MemoId)
+					if err != nil {
+						logger.Error(err)
+					} else {
+						ui.MemoEntry.SetText(newContent.String())
+					}
+
+				}
 
 			}
 		}

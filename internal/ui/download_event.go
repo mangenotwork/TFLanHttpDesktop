@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"TFLanHttpDesktop/common/define"
 	"TFLanHttpDesktop/common/logger"
 	"TFLanHttpDesktop/common/utils"
 	"TFLanHttpDesktop/internal/data"
@@ -59,9 +60,19 @@ func DownloadCopyUrlEvent(url string) {
 		DialogCopyErr()
 		return
 	}
+
+	i, ok := define.ShareHas[url]
+	if !ok {
+		define.ShareId++
+		define.ShareHas[url] = define.ShareId
+		define.ShareMap[define.ShareId] = url
+		i = define.ShareId
+	}
+	url = fmt.Sprintf("%s/s/%d", define.DoMain, i)
+
 	clipboard := MainApp.Clipboard()
 	clipboard.SetContent(url)
-	DialogCopySuccess()
+	DialogCopySuccess(url)
 	return
 }
 

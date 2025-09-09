@@ -196,6 +196,17 @@ func MemoEntryContainerShow(id string) {
 		saveAsTxtBtn,
 		layout.NewSpacer())
 
-	MemoEntryContainer.Add(container.NewBorder(nil, entryLoremIpsumBtn, nil, nil, MemoEntry))
+	title := "标题"
+	memoData, err := data.GetMemoInfo(NowMemoId)
+	if err != nil {
+		logger.Error(err)
+	} else {
+		title = memoData.Name
+	}
+	memoTitle := &widget.Label{
+		Text: title,
+	}
+
+	MemoEntryContainer.Add(container.NewBorder(container.NewCenter(memoTitle), entryLoremIpsumBtn, nil, nil, MemoEntry))
 	MemoEntryContainer.Refresh()
 }

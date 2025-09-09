@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"TFLanHttpDesktop/common/define"
 	"TFLanHttpDesktop/common/logger"
 	"TFLanHttpDesktop/common/utils"
 	"TFLanHttpDesktop/internal/data"
@@ -70,9 +71,19 @@ func UploadCopyUrlEvent(url string) {
 		dialog.ShowError(fmt.Errorf("复制失败，链接为空"), MainWindow)
 		return
 	}
+
+	i, ok := define.ShareHas[url]
+	if !ok {
+		define.ShareId++
+		define.ShareHas[url] = define.ShareId
+		define.ShareMap[define.ShareId] = url
+		i = define.ShareId
+	}
+	url = fmt.Sprintf("%s/s/%d", define.DoMain, i)
+
 	clipboard := MainApp.Clipboard()
 	clipboard.SetContent(url)
-	dialog.ShowInformation("复制成功", "链接已复制到剪贴板!", MainWindow)
+	DialogCopySuccess(url)
 }
 
 func UploadDelEvent() {

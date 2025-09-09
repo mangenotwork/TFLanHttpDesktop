@@ -10,6 +10,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/driver/desktop"
+	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"net/url"
@@ -40,9 +41,16 @@ func MakeMenu() *fyne.MainMenu {
 	}
 	showAbout := func() {
 		w := MainApp.NewWindow(MLGet(MLTAbout))
-		w.SetContent(widget.NewLabel(
+		c := container.NewVBox(layout.NewSpacer(), widget.NewLabel(
 			fmt.Sprintf(MLGet(MLTAboutContent, define.Version)),
 		))
+		c.Add(widget.NewButton("https://github.com/mangenotwork/TFLanHttpDesktop", func() {
+			u, _ := url.Parse("https://github.com/mangenotwork/TFLanHttpDesktop")
+			_ = MainApp.OpenURL(u)
+		}))
+		c.Add(layout.NewSpacer())
+		c.Resize(fyne.NewSize(500, 600))
+		w.SetContent(c)
 		w.Show()
 	}
 

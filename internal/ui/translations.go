@@ -94,7 +94,7 @@ var translations = map[string]map[string]string{
 		MLTLog:                    "log",
 		MLTDialogCopyLinkErr:      "Copy failed, link is empty",
 		MLTDialogTipTitle:         "Tip",
-		MLTDialogCopyLinkSuccess:  "Link copied to clipboard",
+		MLTDialogCopyLinkSuccess:  "Link copied to clipboard.\nLink: %s",
 		MLTDownloadDelSuccess:     "The download link provided to the public for the deleted file has been deleted",
 		MLTDownloadPasswordTitle:  "Set password for downloading files",
 		MLTSave:                   "Save",
@@ -160,7 +160,7 @@ var translations = map[string]map[string]string{
 		MLTLog:                    "日志",
 		MLTDialogCopyLinkErr:      "复制失败，链接为空",
 		MLTDialogTipTitle:         "提示",
-		MLTDialogCopyLinkSuccess:  "链接已复制到剪贴板",
+		MLTDialogCopyLinkSuccess:  "链接已复制到剪贴板;\n链接: %s",
 		MLTDownloadDelSuccess:     "已删除文件对外提供的下载链接",
 		MLTDownloadPasswordTitle:  "为下载文件设置密码",
 		MLTSave:                   "保存",
@@ -364,8 +364,10 @@ func DialogCopyErr() {
 	dialog.NewInformation(translations[currentLang][MLTDialogTipTitle], translations[currentLang][MLTDialogCopyLinkErr], MainWindow).Show()
 }
 
-func DialogCopySuccess() {
-	dialog.NewInformation(translations[currentLang][MLTDialogTipTitle], translations[currentLang][MLTDialogCopyLinkSuccess], MainWindow).Show()
+func DialogCopySuccess(val string) {
+	dialog.NewInformation(translations[currentLang][MLTDialogTipTitle],
+		fmt.Sprintf(translations[currentLang][MLTDialogCopyLinkSuccess], val),
+		MainWindow).Show()
 }
 
 func DialogDelSuccess(mlt string) {
