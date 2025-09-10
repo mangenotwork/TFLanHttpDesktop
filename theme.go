@@ -37,7 +37,7 @@ func newEmbeddedFontTheme() *embeddedFontTheme {
 
 	return &embeddedFontTheme{
 		baseTheme: theme.DefaultTheme(),
-		fontRes:   fyne.NewStaticResource("embedded-font", fontData),
+		fontRes:   fyne.NewStaticResource("NotoSans-Regular.ttf", fontData),
 	}
 }
 
