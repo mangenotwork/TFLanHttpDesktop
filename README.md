@@ -11,7 +11,6 @@ Transfer Files from LAN Http Desktop, 用于局域网内指定文件生成二维
 - 设定密码，一次性下载等功能
 
 #### todo
-- linux 环境优先英文
 - [兼容bug][打包] linux编译deb图标不显示
 - 发布v0.3
 - 性能测试，功能测试

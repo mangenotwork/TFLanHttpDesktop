@@ -6,6 +6,10 @@ const (
 	FcDBFileFileName = "fc.db"
 	CiDBFileFileName = "ci.db"
 	Version          = "v0.1"
+	MainWidth        = 1400
+	MainHeight       = 860
+	Level1Width      = 900
+	Level1Height     = 720
 )
 
 var (

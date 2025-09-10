@@ -139,6 +139,6 @@ func DownloadLogEvent() {
 		content.Add(widget.NewLabel(fmt.Sprintf("%s | %s| %s| %s | %s", v.Time, v.Path, v.Size, v.IP, v.UserAgent)))
 	}
 	downloadDialog := dialog.NewCustom(MLGet(MLTLog), MLGet(MLTClose), container.NewScroll(content), MainWindow)
-	downloadDialog.Resize(fyne.NewSize(1400, 700))
+	downloadDialog.Resize(fyne.NewSize(define.Level1Width, define.Level1Height))
 	downloadDialog.Show()
 }

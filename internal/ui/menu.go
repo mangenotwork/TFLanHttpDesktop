@@ -36,7 +36,7 @@ func MakeMenu() *fyne.MainMenu {
 			content.Add(widget.NewLabel(fmt.Sprintf("%s | %s", v.Time, v.Event)))
 		}
 		downloadDialog := dialog.NewCustom("系统日志", "关闭", container.NewScroll(content), MainWindow)
-		downloadDialog.Resize(fyne.NewSize(1400, 700))
+		downloadDialog.Resize(fyne.NewSize(define.Level1Width, define.Level1Height))
 		downloadDialog.Show()
 	}
 	showAbout := func() {

@@ -90,7 +90,7 @@ func main() {
 	ui.MakeTray(ui.MainApp)
 	ui.InitBus()
 
-	ui.MainWindow.Resize(fyne.NewSize(1600, 900))
+	ui.MainWindow.Resize(fyne.NewSize(define.MainWidth, define.MainHeight))
 	ui.MainWindow.SetMainMenu(ui.MakeMenu())
 	ui.MainWindow.SetMaster()
 	ui.MainWindow.SetContent(ui.MainContent())

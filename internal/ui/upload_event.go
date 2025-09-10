@@ -146,6 +146,6 @@ func UploadLogEvent() {
 		content.Add(widget.NewLabel(fmt.Sprintf("%s | %s| %s| %s | %s", v.Time, v.Path, v.Files, v.IP, v.UserAgent)))
 	}
 	downloadDialog := dialog.NewCustom("上传日志", "关闭", container.NewScroll(content), MainWindow)
-	downloadDialog.Resize(fyne.NewSize(1400, 700))
+	downloadDialog.Resize(fyne.NewSize(define.Level1Width, define.Level1Height))
 	downloadDialog.Show()
 }
