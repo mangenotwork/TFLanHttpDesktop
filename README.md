@@ -31,6 +31,20 @@ v0.3 跨系统测试，提升兼容性
 v0.4 修改bug,稳定版本,并申请应用市场
 v0.5 新需求,待续...
 
+## 问题
+
+#### linux 非root用户运行中文乱码
+```
+非root用户系统字体文件没有权限，需要通过root用户提升权限
+
+如:  /usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc 没有权限
+
+sudo chmod 777 /usr/share/fonts/opentype/noto/ -R
+or
+sudo chmod 777 /usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc
+
+```
+
 
 ## 体验与测试
 

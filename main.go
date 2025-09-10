@@ -12,7 +12,6 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/dialog"
-	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"github.com/gin-gonic/gin"
 	"io"
@@ -42,20 +41,7 @@ func verifyEncoding() {
 }
 
 func init() {
-
-	logger.Debug(theme.RootConfigDir())
-
-	dir, _ := os.Getwd()
-	tf := fmt.Sprintf("%s/fonts/NotoSans-Regular.ttf", dir)
-	logger.Debug(tf)
-	os.Setenv("FYNE_FONT", tf)
-
 	verifyEncoding()
-
-	logger.Debug("FYNE_FONT = ", os.Getenv("FYNE_FONT"))
-	logger.Debug("FYNE_FONT_MONOSPACE = ", os.Getenv("FYNE_FONT_MONOSPACE"))
-	logger.Debug("FYNE_FONT_SYMBOL = ", os.Getenv("FYNE_FONT_SYMBOL"))
-
 	logger.SetLogFile("./logs/", "TFLanHttpDesktop", 7)
 	initDB()
 	cpuNum := runtime.NumCPU()
@@ -93,9 +79,10 @@ func main() {
 
 	icon, _ := fyne.LoadResourceFromPath("./icon.png")
 	ui.MainApp.SetIcon(icon)
-	// 应用自定义主题（使用嵌入的字体）
-	//ui.MainApp.Settings().SetTheme(newEmbeddedFontTheme())
-
+	if runtime.GOOS == "linux" {
+		// 应用自定义主题（使用嵌入的字体）
+		ui.MainApp.Settings().SetTheme(newEmbeddedFontTheme())
+	}
 	ui.MainWindow = ui.MainApp.NewWindow(ui.ML(ui.MLTAppTitle))
 	logger.Debug("初始化UI")
 
@@ -108,9 +95,8 @@ func main() {
 	ui.MainWindow.SetMaster()
 	ui.MainWindow.SetContent(ui.MainContent())
 
-	//notice := widget.NewRichTextFromMarkdown(ui.MLGet(ui.MLWelcomeContent))
-	notice := widget.NewRichTextFromMarkdown("你好这是中文")
-	//notice.Segments[2].(*widget.HyperlinkSegment).Alignment = fyne.TextAlignCenter
+	notice := widget.NewRichTextFromMarkdown(ui.MLGet(ui.MLWelcomeContent))
+	notice.Segments[2].(*widget.HyperlinkSegment).Alignment = fyne.TextAlignCenter
 	dialog.ShowCustom(ui.MLGet(ui.MLWelcome), "OK", notice, ui.MainWindow)
 
 	ui.MainWindow.ShowAndRun()
