@@ -27,11 +27,7 @@ Transfer Files from LAN Http Desktop, 用于局域网内指定文件生成二维
 ![7](./doc/7.png)
 
 #### todo
-- [兼容bug][打包] linux编译deb图标不显示
-- 发布v0.3
-- 性能测试，功能测试
-- 修改bug,提升稳定性
-- 发布v0.4
+- 收集bug,使用者的反馈
 
 ## 设计说明
 1. 该应用采用http协议传输文件，内网中使用，宿主机需要开放防火墙
@@ -61,8 +57,9 @@ sudo chmod 777 /usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc
 ```
 
 
-## 体验与测试
-
+## 需求池
+- 限制上传类型
+- 查看局域网所有ip设备并统计各ip下载信息
 
 
 ## fyne 2.6 局限性

@@ -51,9 +51,7 @@ func GetDownloadLog() ([]*DownloadLog, error) {
 	limit := 1000
 	result := make([]*DownloadLog, 0)
 	db := DB.GetDB()
-	defer func() {
-		_ = db.Close()
-	}()
+
 	err := db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(DownloadLogTable))
 		if bucket == nil {
@@ -92,9 +90,7 @@ func GetUploadLog() ([]*UploadLog, error) {
 	limit := 1000
 	result := make([]*UploadLog, 0)
 	db := DB.GetDB()
-	defer func() {
-		_ = db.Close()
-	}()
+
 	err := db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(UploadLogTable))
 		if bucket == nil {
@@ -271,9 +267,7 @@ func GetOperationLog() ([]*OperationLog, error) {
 	limit := 1000
 	result := make([]*OperationLog, 0)
 	db := DB.GetDB()
-	defer func() {
-		_ = db.Close()
-	}()
+
 	err := db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(OperationLogTable))
 		if bucket == nil {

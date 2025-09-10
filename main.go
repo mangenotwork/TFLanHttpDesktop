@@ -21,27 +21,7 @@ import (
 	"runtime"
 )
 
-// 验证系统编码环境（非root用户可能缺失UTF-8配置）
-func verifyEncoding() {
-	imported := map[string]string{
-		"LC_ALL":   "",
-		"LANG":     "",
-		"LC_CTYPE": "",
-	}
-	for k := range imported {
-		imported[k] = os.Getenv(k)
-	}
-	fmt.Println("系统编码环境:")
-	for k, v := range imported {
-		fmt.Printf("  %s=%q\n", k, v)
-		if v != "zh_CN.UTF-8" && v != "en_US.UTF-8" {
-			fmt.Printf("警告: %s 不是UTF-8编码，可能导致乱码\n", k)
-		}
-	}
-}
-
 func init() {
-	verifyEncoding()
 	logger.SetLogFile("./logs/", "TFLanHttpDesktop", 7)
 	initDB()
 	cpuNum := runtime.NumCPU()
@@ -49,6 +29,21 @@ func init() {
 	gin.DefaultWriter = io.Discard
 	server.Router = gin.Default()
 	mq.RunMq()
+
+	imported := map[string]string{
+		"LC_ALL": "",
+		"LANG":   "",
+	}
+	for k := range imported {
+		imported[k] = os.Getenv(k)
+	}
+	logger.Info("系统编码环境检查")
+	for k, v := range imported {
+		logger.InfoF("  %s=%q\n", k, v)
+		if v != "zh_CN.UTF-8" && v != "en_US.UTF-8" {
+			logger.InfoF("警告: %s 不是UTF-8编码，可能导致乱码\n", k)
+		}
+	}
 }
 
 func main() {
@@ -79,10 +74,10 @@ func main() {
 
 	icon, _ := fyne.LoadResourceFromPath("./icon.png")
 	ui.MainApp.SetIcon(icon)
-	//if runtime.GOOS == "linux" {
+
 	// 应用自定义主题（使用嵌入的字体）
 	ui.MainApp.Settings().SetTheme(newEmbeddedFontTheme())
-	//}
+
 	ui.MainWindow = ui.MainApp.NewWindow(ui.ML(ui.MLTAppTitle))
 	logger.Debug("初始化UI")
 

@@ -44,13 +44,9 @@ func MemoListShow() {
 		},
 	)
 	MemoList.OnSelected = func(id widget.ListItemID) {
-		logger.Debug("id = ", id)
-		logger.Debug("data = ", dataList[id])
-		//MemoEntry.SetText(dataList[id].Name)
 		MemoEntryContainerShow(dataList[id].Id)
 	}
 	MemoList.OnUnselected = func(id widget.ListItemID) {
-		//MemoEntry.SetText(dataList[id].Name)
 		MemoEntryContainerShow(dataList[id].Id)
 	}
 	MemoListContainer.Add(MemoList)
@@ -107,8 +103,6 @@ func MemoShow() {
 }
 
 func MemoEntryContainerShow(id string) {
-	logger.Debug("MemoEntryContainerShow... id=", id)
-
 	NowMemoId = id
 
 	content, err := data.GetMemoContent(id)

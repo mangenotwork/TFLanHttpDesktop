@@ -136,11 +136,7 @@ func UploadPasswordEvent(value string) {
 }
 
 func UploadLogEvent() {
-	logger.Debug("UploadLogEvent")
-
 	logList, _ := data.GetUploadLog()
-	logger.Debug("logList", logList)
-
 	content := container.NewVBox()
 	for _, v := range logList {
 		content.Add(widget.NewLabel(fmt.Sprintf("%s | %s| %s| %s | %s", v.Time, v.Path, v.Files, v.IP, v.UserAgent)))

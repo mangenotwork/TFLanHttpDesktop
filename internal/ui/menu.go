@@ -2,7 +2,6 @@ package ui
 
 import (
 	"TFLanHttpDesktop/common/define"
-	"TFLanHttpDesktop/common/logger"
 	"TFLanHttpDesktop/internal/data"
 	"fmt"
 	"fyne.io/fyne/v2"
@@ -30,7 +29,7 @@ func MakeMenu() *fyne.MainMenu {
 	}
 	operationLog := func() {
 		logList, _ := data.GetOperationLog()
-		logger.Debug("logList", logList)
+
 		content := container.NewVBox()
 		for _, v := range logList {
 			content.Add(widget.NewLabel(fmt.Sprintf("%s | %s", v.Time, v.Event)))

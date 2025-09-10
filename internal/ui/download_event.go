@@ -132,8 +132,6 @@ func DownloadLogEvent() {
 	logger.Debug("DownloadLogEvent")
 
 	logList, _ := data.GetDownloadLog()
-	logger.Debug("logList", logList)
-
 	content := container.NewVBox()
 	for _, v := range logList {
 		content.Add(widget.NewLabel(fmt.Sprintf("%s | %s| %s| %s | %s", v.Time, v.Path, v.Size, v.IP, v.UserAgent)))

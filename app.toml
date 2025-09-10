@@ -2,7 +2,7 @@
 Icon = "icon.png"
 Name = "TFLanHttpDesktop"
 ID = "TFLanHttpDesktop.2025.0826"
-Version = "0.1.1"
+Version = "0.4.1"
 Build = 1
 
 [Migrations]

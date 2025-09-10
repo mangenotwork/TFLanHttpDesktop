@@ -115,10 +115,9 @@ func UploadContainerShow() {
 		delBtn,
 		pwdBtn,
 		//&widget.Button{
-		//	Text: "限制类型",
+		//	Text: "限制上传类型",
 		//	//Icon: theme.NavigateNextIcon(),
 		//	OnTapped: func() {
-		//		logger.Debug("密码管理")
 		//		// todo ...
 		//	},
 		//},
