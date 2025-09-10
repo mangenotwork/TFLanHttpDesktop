@@ -8,7 +8,7 @@ import (
 	"image/color"
 )
 
-//go:embed fonts/NotoSansCJK-Bold.ttc
+//go:embed fonts/NotoSansCJKsc-Bold.ttf
 var fontFiles embed.FS
 
 // 自定义主题，使用嵌入的中文字体
@@ -20,7 +20,7 @@ type embeddedFontTheme struct {
 // 初始化主题，加载嵌入的中文字体
 func newEmbeddedFontTheme() *embeddedFontTheme {
 	// 读取嵌入的字体文件（替换为你的字体文件名）
-	fontData, err := fontFiles.ReadFile("fonts/NotoSansCJK-Bold.ttc")
+	fontData, err := fontFiles.ReadFile("fonts/NotoSansCJKsc-Bold.ttf")
 	if err != nil {
 		fyne.LogError("无法读取嵌入的字体文件", err)
 		return &embeddedFontTheme{baseTheme: theme.DefaultTheme()}
@@ -34,7 +34,7 @@ func newEmbeddedFontTheme() *embeddedFontTheme {
 
 	return &embeddedFontTheme{
 		baseTheme: theme.DefaultTheme(),
-		fontRes:   fyne.NewStaticResource("NotoSansCJK-Bold.ttc", fontData),
+		fontRes:   fyne.NewStaticResource("NotoSansCJKsc-Bold.ttf", fontData),
 	}
 }
 

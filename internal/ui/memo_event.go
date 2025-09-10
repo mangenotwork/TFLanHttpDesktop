@@ -70,6 +70,11 @@ func NewMemoEvent(isEdit bool, memoId string) {
 
 	passwordDialog := dialog.NewForm(dialogTitle, dialogConfirm, MLGet(MLTCancel), items, func(b bool) {
 
+		if !b {
+			logger.Debug("取消")
+			return
+		}
+
 		logger.Debug("name = ", name.Text)
 		logger.Debug("authorityValue = ", authorityValue)
 		logger.Debug("password = ", password.Text)

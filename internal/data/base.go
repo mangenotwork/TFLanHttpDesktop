@@ -224,6 +224,7 @@ func (ldb *LocalDB) Get(table, key string, data interface{}) error {
 
 		err := json.Unmarshal(bt, data)
 		if err != nil {
+			logger.Debug(err)
 			return err
 		}
 

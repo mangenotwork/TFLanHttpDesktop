@@ -79,10 +79,10 @@ func main() {
 
 	icon, _ := fyne.LoadResourceFromPath("./icon.png")
 	ui.MainApp.SetIcon(icon)
-	if runtime.GOOS == "linux" {
-		// 应用自定义主题（使用嵌入的字体）
-		ui.MainApp.Settings().SetTheme(newEmbeddedFontTheme())
-	}
+	//if runtime.GOOS == "linux" {
+	// 应用自定义主题（使用嵌入的字体）
+	ui.MainApp.Settings().SetTheme(newEmbeddedFontTheme())
+	//}
 	ui.MainWindow = ui.MainApp.NewWindow(ui.ML(ui.MLTAppTitle))
 	logger.Debug("初始化UI")
 
