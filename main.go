@@ -41,10 +41,10 @@ func verifyEncoding() {
 }
 
 func init() {
-	//dir, _ := os.Getwd()
-	//tf := fmt.Sprintf("%s/fonts/NotoSans-Regular.ttf", dir)
-	//logger.Debug(tf)
-	//os.Setenv("FYNE_FONT", tf)
+	dir, _ := os.Getwd()
+	tf := fmt.Sprintf("%s/fonts/NotoSans-Regular.ttf", dir)
+	logger.Debug(tf)
+	os.Setenv("FYNE_FONT", tf)
 
 	verifyEncoding()
 
@@ -90,7 +90,7 @@ func main() {
 	icon, _ := fyne.LoadResourceFromPath("./icon.png")
 	ui.MainApp.SetIcon(icon)
 	// 应用自定义主题（使用嵌入的字体）
-	ui.MainApp.Settings().SetTheme(newEmbeddedFontTheme())
+	//ui.MainApp.Settings().SetTheme(newEmbeddedFontTheme())
 
 	ui.MainWindow = ui.MainApp.NewWindow(ui.ML(ui.MLTAppTitle))
 	logger.Debug("初始化UI")
