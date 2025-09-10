@@ -255,14 +255,14 @@ func (b *EventBus) TriggerLangChanged() {
 
 // 3. 翻译管理器
 var (
-	currentLang = "zh-CN"
+	CurrentLang = "zh-CN"
 	langMu      sync.Mutex
 )
 
 // SetLang 设置当前语言并触发事件
 func SetLang(lang string) {
 	langMu.Lock()
-	currentLang = lang
+	CurrentLang = lang
 	langMu.Unlock()
 
 	// 通知所有组件刷新
@@ -305,7 +305,7 @@ func SetLang(lang string) {
 // ML 多语言 multilingual
 func ML(key string, val ...any) string {
 	langMu.Lock()
-	lang := currentLang
+	lang := CurrentLang
 	langMu.Unlock()
 
 	if trans, ok := translations[lang]; ok {
@@ -350,7 +350,7 @@ func RegisterTranslatable(key string, component interface{}, val ...any) {
 }
 
 func MLGet(mlt string, val ...any) string {
-	str, ok := translations[currentLang][mlt]
+	str, ok := translations[CurrentLang][mlt]
 	if !ok {
 		return ""
 	}
@@ -361,15 +361,15 @@ func MLGet(mlt string, val ...any) string {
 }
 
 func DialogCopyErr() {
-	dialog.NewInformation(translations[currentLang][MLTDialogTipTitle], translations[currentLang][MLTDialogCopyLinkErr], MainWindow).Show()
+	dialog.NewInformation(translations[CurrentLang][MLTDialogTipTitle], translations[CurrentLang][MLTDialogCopyLinkErr], MainWindow).Show()
 }
 
 func DialogCopySuccess(val string) {
-	dialog.NewInformation(translations[currentLang][MLTDialogTipTitle],
-		fmt.Sprintf(translations[currentLang][MLTDialogCopyLinkSuccess], val),
+	dialog.NewInformation(translations[CurrentLang][MLTDialogTipTitle],
+		fmt.Sprintf(translations[CurrentLang][MLTDialogCopyLinkSuccess], val),
 		MainWindow).Show()
 }
 
 func DialogDelSuccess(mlt string) {
-	dialog.NewInformation(translations[currentLang][MLTDialogTipTitle], translations[currentLang][mlt], MainWindow).Show()
+	dialog.NewInformation(translations[CurrentLang][MLTDialogTipTitle], translations[CurrentLang][mlt], MainWindow).Show()
 }

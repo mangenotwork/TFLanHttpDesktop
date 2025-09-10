@@ -8,9 +8,6 @@ import (
 	"image/color"
 )
 
-// 嵌入字体文件（//go:embed 指令必须放在变量定义前，且路径相对于当前文件）
-// 注意：fonts目录下的所有.ttf文件都会被嵌入
-//
 //go:embed fonts/NotoSans-Regular.ttf
 var fontFiles embed.FS
 
@@ -42,11 +39,12 @@ func newEmbeddedFontTheme() *embeddedFontTheme {
 }
 
 func (e *embeddedFontTheme) Font(style fyne.TextStyle) fyne.Resource {
-	if e.fontRes != nil {
-		logger.Debug("使用嵌入字体")
-		return e.fontRes // 忽略样式，所有控件都使用中文字体
-	}
-	return e.baseTheme.Font(style) // 失败时回退到默认字体
+	//if e.fontRes != nil {
+	//	logger.Debug("使用嵌入字体")
+	//	return e.fontRes // 忽略样式，所有控件都使用中文字体
+	//}
+	logger.Debug("使用默认字体")
+	return theme.DefaultTextFont() // 失败时回退到默认字体
 }
 
 func (e *embeddedFontTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVariant) color.Color {

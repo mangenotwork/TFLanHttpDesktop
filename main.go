@@ -22,6 +22,15 @@ import (
 )
 
 func init() {
+	//dir, _ := os.Getwd()
+	//tf := fmt.Sprintf("%s/fonts/NotoSans-Regular.ttf", dir)
+	//logger.Debug(tf)
+	//os.Setenv("FYNE_FONT", tf)
+
+	logger.Debug("FYNE_FONT = ", os.Getenv("FYNE_FONT"))
+	logger.Debug("FYNE_FONT_MONOSPACE = ", os.Getenv("FYNE_FONT_MONOSPACE"))
+	logger.Debug("FYNE_FONT_SYMBOL = ", os.Getenv("FYNE_FONT_SYMBOL"))
+
 	logger.SetLogFile("./logs/", "TFLanHttpDesktop", 7)
 	initDB()
 	cpuNum := runtime.NumCPU()
