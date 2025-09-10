@@ -10,6 +10,22 @@ Transfer Files from LAN Http Desktop, 用于局域网内指定文件生成二维
 - 在同内网下共享备忘录，在不同设备上共享文本信息
 - 设定密码，一次性下载等功能
 
+### 软件截图
+
+![1](./doc/1.png)
+
+![2](./doc/2.png)
+
+![3](./doc/3.png)
+
+![4](./doc/4.png)
+
+![5](./doc/5.png)
+
+![6](./doc/6.png)
+
+![7](./doc/7.png)
+
 #### todo
 - [兼容bug][打包] linux编译deb图标不显示
 - 发布v0.3
