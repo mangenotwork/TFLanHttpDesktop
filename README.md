@@ -11,13 +11,7 @@ Transfer Files from LAN Http Desktop, 用于局域网内指定文件生成二维
 - 设定密码，一次性下载等功能
 
 #### todo
-- 发布v0.2
-- 跨平台测试 windows linux 
-- 修改兼容bug
-- [优化]linux上尺寸太大，调整尺寸
-- [兼容bug]linux 上中文乱码
-- [兼容bug]linux没有系统通知提示
-- [图标] 256*256
+- linux 环境优先英文
 - [兼容bug][打包] linux编译deb图标不显示
 - 发布v0.3
 - 性能测试，功能测试
@@ -51,6 +45,7 @@ v0.5 新需求,待续...
 - 新老版本方法差距太大，市面上资料和文档老版本偏多
 - windows上交叉编译linux,darwin环境不好搭建
 - linux普通用户扫不到系统的中文字体文件，或者根本就没有中文字体
+- linux deepin 下编译，非root下中文乱码（无解决方案？？）
 - 
 
 ## build

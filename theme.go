@@ -1,21 +1,12 @@
 package main
 
 import (
+	"TFLanHttpDesktop/common/logger"
 	"embed"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/theme"
 	"image/color"
 )
-
-type forcedVariant struct {
-	fyne.Theme
-
-	variant fyne.ThemeVariant
-}
-
-func (f *forcedVariant) Color(name fyne.ThemeColorName, _ fyne.ThemeVariant) color.Color {
-	return f.Theme.Color(name, f.variant)
-}
 
 // 嵌入字体文件（//go:embed 指令必须放在变量定义前，且路径相对于当前文件）
 // 注意：fonts目录下的所有.ttf文件都会被嵌入
@@ -50,15 +41,14 @@ func newEmbeddedFontTheme() *embeddedFontTheme {
 	}
 }
 
-// 实现Theme接口的Font方法，强制所有控件使用嵌入的字体
 func (e *embeddedFontTheme) Font(style fyne.TextStyle) fyne.Resource {
 	if e.fontRes != nil {
+		logger.Debug("使用嵌入字体")
 		return e.fontRes // 忽略样式，所有控件都使用中文字体
 	}
 	return e.baseTheme.Font(style) // 失败时回退到默认字体
 }
 
-// 继承默认主题的其他配置（颜色、图标、尺寸）
 func (e *embeddedFontTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVariant) color.Color {
 	return e.baseTheme.Color(name, variant)
 }

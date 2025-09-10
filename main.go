@@ -73,8 +73,9 @@ func main() {
 	ui.MainWindow.SetMaster()
 	ui.MainWindow.SetContent(ui.MainContent())
 
-	notice := widget.NewRichTextFromMarkdown(ui.MLGet(ui.MLWelcomeContent))
-	notice.Segments[2].(*widget.HyperlinkSegment).Alignment = fyne.TextAlignCenter
+	//notice := widget.NewRichTextFromMarkdown(ui.MLGet(ui.MLWelcomeContent))
+	notice := widget.NewRichTextFromMarkdown("你好这是中文")
+	//notice.Segments[2].(*widget.HyperlinkSegment).Alignment = fyne.TextAlignCenter
 	dialog.ShowCustom(ui.MLGet(ui.MLWelcome), "OK", notice, ui.MainWindow)
 
 	ui.MainWindow.ShowAndRun()
