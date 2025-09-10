@@ -12,6 +12,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"github.com/gin-gonic/gin"
 	"io"
@@ -41,6 +42,9 @@ func verifyEncoding() {
 }
 
 func init() {
+
+	logger.Debug(theme.RootConfigDir())
+
 	dir, _ := os.Getwd()
 	tf := fmt.Sprintf("%s/fonts/NotoSans-Regular.ttf", dir)
 	logger.Debug(tf)
